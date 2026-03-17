@@ -1,6 +1,7 @@
 <template>
   <main class="st:bg-gradient-to-br st:from-[#056C87] st:to-black st:h-full st:w-full st:py-[40px] st:px-4">
-    <div class="st:max-w-[1400px] st:mx-auto st:flex st:items-center st:justify-center st:items-stretch">
+    <form @submit.prevent="registerUser"
+      class="st:max-w-[1400px] st:mx-auto st:flex st:items-center st:justify-center st:items-stretch">
       <div
         class="st:hidden st:md:block st:w-[40%] st:bg-[url(img2.avif)] st:bg-no-repeat st:bg-cover st:rounded-[30px] st:md:rounded-r-[0px] st:overflow-hidden">
         <div class="st:w-full st:h-full st:bg-black/40 st:flex st:items-center st:justify-center st:gap-[10px]">
@@ -12,7 +13,6 @@
         </div>
       </div>
 
-
       <div
         class="st:w-full st:md:w-[60%] st:flex st:flex-col st:bg-white st:px-[10px] st:md:px-[10px] st:py-[20px] st:gap-[30px] st:rounded-[30px] st:md:rounded-l-[0px]">
         <h2 class="st:text-[32px] st:md:text-[44px] st:font-extrabold st:text-center">Registration Form</h2>
@@ -23,12 +23,12 @@
             class="st:flex st:flex-col st:md:flex-row st:md:items-center st:md:justify-center st:gap-[20px] st:w-full">
             <div class="st:flex st:flex-col st:items-start st:gap-[5px] st:md:w-[49%]">
               <label for="name">FirstName:</label>
-              <input type="text" v-model.trim="form.firstname" placeholder="Enter Your First Name"
+              <input type="text" v-model.trim="form.firstname" placeholder="Enter Your First Name" required
                 class="st:border st:border-gray-400 st:rounded-[10px] st:px-[10px] st:bg-[#056C87] st:text-white st:py-[5px] st:w-full">
             </div>
             <div class="st:flex st:flex-col st:items-start st:gap-[5px] st:md:w-[49%]">
               <label for="name">LastName:</label>
-              <input type="text" v-model.trim="form.lastname" placeholder="Enter Your First Name"
+              <input type="text" v-model.trim="form.lastname" placeholder="Enter Your First Name" required
                 class="st:border st:border-gray-400 st:rounded-[10px] st:px-[10px] st:bg-[#056C87] st:text-white st:py-[5px] st:w-full">
             </div>
           </div>
@@ -42,7 +42,7 @@
             </div>
             <div class="st:flex st:flex-col st:items-start st:gap-[5px] st:md:w-[49%]">
               <label for="name">Email:</label>
-              <input type="email" v-model="form.email" placeholder="Enter Your Email Address"
+              <input type="email" v-model="form.email" placeholder="Enter Your Email Address" required
                 class="st:border st:border-gray-400 st:rounded-[10px] st:px-[10px] st:bg-[#056C87] st:text-white st:py-[5px] st:w-full">
             </div>
           </div>
@@ -118,16 +118,16 @@
           </div>
 
           <div class="st:flex st:items-start st:justify-start st:w-full st:gap-[20px]">
-            <button @click="registerUser"
+            <button type="submit"
               class="st:flex st:justify-center st:text-[24px] st:border st:bg-[#056C87]  st:py-[10px] st:rounded-[15px]  st:text-white st:w-full  st:mx-auto">
               {{ editId === null ? "Register" : "Update" }}</button>
-            <button @click="clearForm"
-              class="st:flex st:justify-center st:text-[24px] st:border st:bg-[#056C87]  st:py-[10px] st:rounded-[15px]  st:text-white st:w-full  st:mx-auto">
+            <button @click.prevent="clearForm"
+              class="st:flex st:justify-center st:text-[24px] st:border st:bg-red-500  st:py-[10px] st:rounded-[15px]  st:text-white st:w-full  st:mx-auto">
               {{ editId === null ? "Clear" : "Cancel" }}</button>
           </div>
         </div>
       </div>
-    </div>
+    </form>
 
     <div class="st:max-w-[1400px] st:mx-auto st:mt-[60px]">
       <h2 class="st:text-[32px] st:md:text-[44px] st:text-white st:font-[600] st:mb-[20px]">Registration Data</h2>
@@ -141,15 +141,11 @@
         </div>
 
         <div class="st:w-1/2 st:md:w-auto">
-          <select name="sort" v-model="sortVal"
+          <select v-model="sortVal"
             class="st:text-[16px] st:md:text-[20px] st:w-full st:h-[38px] st:px-[15px] st:py-[3px] st:rounded st:bg-[#012E3C] st:text-white st:border st:border-gray-500 st:cursor-pointer">
-            <option>Sort:</option>
-            <option value="NameAZ">Name A-Z ↑</option>
-            <option value="NameZA">Name Z-A ↓</option>
-            <option value="AgeInc">Age ↑</option>
-            <option value="AgeDec">Age ↓</option>
-            <option value="SubjectsInc">Subjects ↑</option>
-            <option value="SubjectsDec">Subjects↓</option>
+            <option v-for="sortoption in sortOptions" :key="sortoption.value" :value="sortoption.value">
+              {{ sortoption.label }}
+            </option>
           </select>
         </div>
       </div>
@@ -161,36 +157,18 @@
           <div class="st:mb-[20px]">
             <p class="st:mb-[5px]">Gender</p>
 
-            <label class="st:block">
-              <input type="checkbox" v-model="filters.filteredGender" value="Male"> Male
-            </label>
-
-            <label class="st:block">
-              <input type="checkbox" v-model="filters.filteredGender" value="Female"> Female
-            </label>
-
-            <label class="st:block">
-              <input type="checkbox" v-model="filters.filteredGender" value="Other"> Other
+            <label v-for="gender in genderOptions" :key="gender" class="st:block">
+              <input type="checkbox" v-model="filters.filteredGender" :value="gender">
+              {{ gender }}
             </label>
           </div>
 
           <div class="st:mb-[20px]">
             <p class="st:mb-[5px]">Subjects</p>
 
-            <label class="st:block">
-              <input type="checkbox" v-model="filters.filteredSubjects" value="C++"> C++
-            </label>
-
-            <label class="st:block">
-              <input type="checkbox" v-model="filters.filteredSubjects" value="Java"> Java
-            </label>
-
-            <label class="st:block">
-              <input type="checkbox" v-model="filters.filteredSubjects" value="Python"> Python
-            </label>
-
-            <label class="st:block">
-              <input type="checkbox" v-model="filters.filteredSubjects" value="SQL"> JavaScript
+            <label v-for="subject in subjectOptions" :key="subject" class="st:block">
+              <input type="checkbox" v-model="filters.filteredSubjects" :value="subject">
+              {{ subject }}
             </label>
 
           </div>
@@ -198,16 +176,9 @@
           <div class="st:mb-[20px]">
             <p class="st:mb-[5px]">Exam Center</p>
 
-            <label class="st:block">
-              <input type="checkbox" v-model="filters.filteredCenters" value="Delhi"> Delhi
-            </label>
-
-            <label class="st:block">
-              <input type="checkbox" v-model="filters.filteredCenters" value="Mumbai"> Mumbai
-            </label>
-
-            <label class="st:block">
-              <input type="checkbox" v-model="filters.filteredCenters" value="Kolkata"> Kolkata
+            <label v-for="center in centerOptions" :key="center" class="st:block">
+              <input type="checkbox" v-model="filters.filteredCenters" :value="center">
+              {{ center }}
             </label>
           </div>
 
@@ -217,7 +188,7 @@
           </button>
         </div>
 
-        <div :class="{ 'wide-box': isActive }" class="st:overflow-auto st:w-4/5">
+        <div class="st:overflow-auto" :class="isActive ? 'st:w-4/5' : 'st:w-full'">
           <table class="st:w-full st:border-collapse">
             <thead>
               <tr>
@@ -282,6 +253,7 @@
 </template>
 
 <script>
+import { SortType, Gender, Subjects, Centers } from "./types";
 export default {
   data() {
     return {
@@ -296,7 +268,7 @@ export default {
           phone: "8765672269",
           gender: "Male",
           examcenter: "Delhi",
-          subjects: ["Java"]
+          subjects: ["Java", "C++"]
         },
         {
           id: 2,
@@ -308,7 +280,7 @@ export default {
           phone: "8855219675",
           gender: "Male",
           examcenter: "Mumbai",
-          subjects: ["Java", "C++"]
+          subjects: ["Java"]
         },
         {
           id: 3,
@@ -332,7 +304,7 @@ export default {
           phone: "8765672232",
           gender: "Female",
           examcenter: "Kolkata",
-          subjects: ["JavaScript"]
+          subjects: ["Python"]
         },
         {
           id: 5,
@@ -343,8 +315,8 @@ export default {
           email: "lauren@gmail.com",
           phone: "7065857770",
           gender: "Male",
-          examcenter: "Delhi",
-          subjects: ["SQL", "JavaScript"]
+          examcenter: "Kolkata",
+          subjects: ["SQL", "Java", "Python"]
         },
         {
           id: 6,
@@ -356,21 +328,37 @@ export default {
           phone: "8700093751",
           gender: "Other",
           examcenter: "Delhi",
-          subjects: ["SQL", "JavaScript", "C++", "Java"]
+          subjects: ["SQL", "Python", "C++", "Java"]
         },
 
       ],
       nextId: 7,
       editId: null,
+      SortType,
       sortVal: "",
       isActive: false,
+
+      sortOptions: [
+        { label: "sort", value: "" },
+        { label: "Name A-Z ↑", value: SortType.NameAZ },
+        { label: "Name Z-A ↓", value: SortType.NameZA },
+        { label: "Age ↑", value: SortType.AgeInc },
+        { label: "Age ↓", value: SortType.AgeDec },
+        { label: "Subjects ↑", value: SortType.SubjectsInc },
+        { label: "Subjects ↓", value: SortType.SubjectsDec }
+      ],
+
+      genderOptions: [Gender.Male, Gender.Female, Gender.Other],
+
+      subjectOptions: [Subjects.Cplus, Subjects.Java, Subjects.Python, Subjects.SQL],
+
+      centerOptions: [Centers.Delhi, Centers.Mumbai, Centers.Kolkata],
 
       filters: {
         filteredGender: [],
         filteredSubjects: [],
         filteredCenters: [],
       },
-
 
       form: {
         firstname: "",
@@ -391,22 +379,6 @@ export default {
 
       const userData = {
         id: this.nextId, ...this.form, age
-      }
-
-      if (this.form.firstname === "") {
-        alert("First name cannot be Empty");
-        return;
-      }
-      else if (this.form.lastname === "") {
-        alert("Last name cannot be Empty");
-        return;
-      }
-      else if (age < 18) {
-        alert("Age must be greater than 18");
-        return;
-      } else if (this.form.phone.length != 10) {
-        alert("Mobile number must be 10 digits");
-        return;
       }
 
       if (this.editId === null) {
@@ -479,6 +451,32 @@ export default {
       this.filters.filteredCenters = [];
       this.filters.filteredSubjects = [];
     },
+
+    sortData(data, order = "asc", type) {
+      data.sort((a, b) => {
+        let fa = a[type];
+        let fb = b[type];
+        console.log(typeof fa);
+        console.log(typeof fb);
+
+        if (typeof fa === "string") {
+          console.log("in if");
+          fa = fa.toLowerCase();
+          fb = fb.toLowerCase();
+        }
+        else if (typeof fa === "object") {
+          console.log("in else");
+          fa = fa.length;
+          fb = fb.length;
+        }
+
+        if (fa < fb) {
+          return order === "asc" ? -1 : 1;
+        } else {
+          return order === "asc" ? 1 : -1;
+        }
+      });
+    },
   },
   computed: {
     filteredData() {
@@ -494,72 +492,23 @@ export default {
         return genderr && centerr && subjectt;
       });
 
-      if (this.sortVal === "NameAZ") {
-        data.sort((a, b) => {
-          let fa = a.firstname.toLowerCase(), fb = b.firstname.toLowerCase();
-          if (fa < fb) {
-            return -1;
-          }
-          if (fa > fb) {
-            return 1;
-          }
-          return 0;
-        })
-      } else if (this.sortVal === "NameZA") {
-        data.sort((a, b) => {
-          let fa = a.firstname.toLowerCase(), fb = b.firstname.toLowerCase();
-          if (fa < fb) {
-            return 1;
-          }
-          if (fa > fb) {
-            return -1;
-          }
-          return 0;
-        })
-      } else if (this.sortVal === "AgeInc") {
-        data.sort((a, b) => {
-          let fa = a.age, fb = b.age;
-          if (fa < fb) {
-            return -1;
-          }
-          if (fa > fb) {
-            return 1;
-          }
-          return 0;
-        })
-      } else if (this.sortVal === "AgeDec") {
-        data.sort((a, b) => {
-          let fa = a.age, fb = b.age;
-          if (fa < fb) {
-            return 1;
-          }
-          if (fa > fb) {
-            return -1;
-          }
-          return 0;
-        })
-      } else if (this.sortVal === "SubjectsInc") {
-        data.sort((a, b) => {
-          let fa = a.subjects.length, fb = b.subjects.length;
-          if (fa < fb) {
-            return -1;
-          }
-          if (fa > fb) {
-            return 1;
-          }
-          return 0;
-        })
-      } else if (this.sortVal === "SubjectsDec") {
-        data.sort((a, b) => {
-          let fa = a.subjects.length, fb = b.subjects.length;
-          if (fa < fb) {
-            return 1;
-          }
-          if (fa > fb) {
-            return -1;
-          }
-          return 0;
-        })
+      if (this.sortVal === SortType.NameAZ) {
+        this.sortData(data, "asc", "firstname");
+      }
+      else if (this.sortVal === SortType.NameZA) {
+        this.sortData(data, "desc", "firstname");
+      }
+      else if (this.sortVal === SortType.AgeInc) {
+        this.sortData(data, "asc", "age");
+      }
+      else if (this.sortVal === SortType.AgeDec) {
+        this.sortData(data, "desc", "age");
+      }
+      else if (this.sortVal === SortType.SubjectsInc) {
+        this.sortData(data, "asc", "subjects");
+      }
+      else if (this.sortVal === SortType.SubjectsDec) {
+        this.sortData(data, "desc", "subjects");
       }
 
       return data;
@@ -567,9 +516,3 @@ export default {
   }
 }
 </script>
-
-<style>
-.wide-box {
-  width: 100%;
-}
-</style>
