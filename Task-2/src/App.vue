@@ -3,7 +3,7 @@
     <form @submit.prevent="registerUser"
       class="st:max-w-[1400px] st:mx-auto st:flex st:items-center st:justify-center st:items-stretch">
       <div
-        class="st:hidden st:md:block st:w-[40%] st:bg-[url(src/Assets/img2.avif)] st:bg-no-repeat st:bg-cover st:rounded-[30px] st:md:rounded-r-[0px] st:overflow-hidden">
+        class="st:hidden st:md:block st:w-[40%] st:bg-[url(src/assets/img2.avif)] st:bg-no-repeat st:bg-cover st:rounded-[30px] st:md:rounded-r-[0px] st:overflow-hidden">
         <div class="st:w-full st:h-full st:bg-black/40 st:flex st:items-center st:justify-center st:gap-[10px]">
           <div class="st:max-w-[60%] st:mx-auto st:flex st:flex-col st:items-center st:justify-start">
             <h1 class="st:text-[44px] st:text-center st:text-white st:font-[500]">Search Tap</h1>
