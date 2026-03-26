@@ -210,7 +210,7 @@
               class="st:flex st:items-center st:justify-between st:w-full st:border-b st:border-b-gray-200 st:px-[20px] st:md:px-0 st:pt-[15px] st:md:pt-0 st:pb-[10px]">
               <h2 class="st:text-[14px] st:font-[400] st:text-[#000000bf]">Filter</h2>
               <button v-if="clearAll" @click="clearFilters"
-                class="st:border-b st:hover:border-b-[2px]  st:cursor-pointer st:text-[14px] st:font-[400] st:text-[#000000bf]">Remove
+                class="st:underline st:hover:decoration-2 st:cursor-pointer st:text-[14px] st:font-[400] st:text-[#000000bf]">Remove
                 all</button>
             </div>
 
@@ -224,7 +224,7 @@
                   <div class="st:flex st:items-center st:gap-[10px]">
                     <button v-if="filter.selected.length > 0"
                       @click="clearFilter(filter.field), filter.isOpen = !filter.isOpen"
-                      class="st:text-[14px] st:cursor-pointer">Clear</button>
+                      class="st:text-[14px] st:cursor-pointer st:hover:underline">Clear</button>
                     <svg v-if="filter.isOpen" class="st:w-[14px] st:transition-transform" viewBox="0 0 600 500"
                       width="12" height="12" fill="#000">
                       <path d="m275.565 189.451 223.897 223.897h51.668l-275.565-275.565-275.565 275.565h51.668z"></path>
