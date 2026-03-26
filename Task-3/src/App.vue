@@ -802,6 +802,10 @@ export default {
     handleScroll() {
       if (window.scrollY > 1000) this.isVisible = true;
       else this.isVisible = false;
+
+      if (document.activeElement.tagName === 'INPUT') {
+        document.activeElement.blur();
+      }
     },
     scrollToTop() {
       window.scrollTo({
