@@ -38,7 +38,8 @@
       class="st:absolute st:bottom-[50px] st:md:bottom-[120px] st:right-[60px] st:md:right-[80px] st:lg:right-[100px]">
       <button v-if="isVisible" @click="scrollToTop"
         class="st:flex st:items-center st:justify-center st:fixed st:border st:bg-black st:w-[35px] st:h-[35px] st:z-100">
-        <svg class="st:w-[16px] st:h-[16px]" viewBox="0 0 600 500" width="20" height="20" fill="#fff">data-v-5f2ce35c=""><path
+        <svg class="st:w-[16px] st:h-[16px]" viewBox="0 0 600 500" width="20" height="20"
+          fill="#fff">data-v-5f2ce35c=""><path
             d="m275.565 189.451 223.897 223.897h51.668l-275.565-275.565-275.565 275.565h51.668z"></path></svg>
       </button>
     </div>
@@ -312,15 +313,15 @@
                   Exclude Out of Stock
                 </label> -->
 
-                <label @click="excludeOutOfStock = !excludeOutOfStock"
-                  class="st:flex st:items-center st:justify-center  st:gap-[8px] st:cursor-pointer">
-                  <input type="checkbox" @change="applyFilters" class="st:hidden">
+                <label class="st:flex st:items-center st:justify-center  st:gap-[8px] st:cursor-pointer">
+                  <input @click="excludeOutOfStock = !excludeOutOfStock" type="checkbox" @change="applyFilters"
+                    class="st:hidden">
                   <div
                     class="st:w-[16px] st:h-[16px] st:border st:border-black st:flex st:items-center st:justify-center">
                     <img v-if="excludeOutOfStock" src="/src/assets/tick.svg" alt="tick" class="st:w-[15px] st:h-[15px]">
                   </div>
                   <span
-                    class="st:flex-1 st:hover:text-black st:hover:underline st:text-[14px] st:text-[#213555]">Exclude
+                    class="st:flex-1 st:hover:text-black st:hover:underline st:text-[14px] st:text-[#213555] st:font-[700]">Exclude
                     Out of Stock</span>
                 </label>
               </div>
