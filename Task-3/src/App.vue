@@ -4,10 +4,12 @@
     <img src="/src/assets/header2.png" alt="header" class="st:w-full st:hidden st:md:block st:lg:hidden">
     <img src="/src/assets/header3.png" alt="header" class="st:w-full st:md:hidden">
   </header>
+
+  <!-- search -->
   <div
-    class="st:flex st:items-center st:justify-center st:md:justify-end st:md:items-end st:max-w-[1200px] st:mx-auto st:my-[10px]">
+    class="st:flex st:items-center st:justify-center st:md:justify-end st:md:items-end st:max-w-[1200px] st:mx-auto st:my-[10px] st:sticky st:top-0 st:bg-white  st:z-40 st:py-[10px] st:md:static">
     <input type="text" v-model="query" @input="handleSearch" placeholder="Search product"
-      class="st:border st:p-[8px] st:w-full st:mx-[20px] st:md:w-[40%] st:rounded-[10px] st:py-[15px]">
+      class="st:border st:border-gray-300 st:px-[8px] st:py-[8px] st:w-full st:mx-[20px] st:md:w-[40%] st:outline-none">
   </div>
 
 
@@ -35,7 +37,10 @@
     <div v-if="!showMobileFilters && !showMobileSort"
       class="st:absolute st:bottom-[50px] st:md:bottom-[120px] st:right-[60px] st:md:right-[80px] st:lg:right-[100px]">
       <button v-if="isVisible" @click="scrollToTop"
-        class="st:text-[28px] st:md:text-[34px] st:lg:text-[40px] st:fixed st:text-white st:border st:bg-black st:w-[35px] st:h-[35px] st:md:w-[43px] st:md:h-[43px] st:lg:w-[50px] st:lg:h-[50px] st:text-center st:z-100">^</button>
+        class="st:flex st:items-center st:justify-center st:fixed st:border st:bg-black st:w-[35px] st:h-[35px] st:z-100">
+        <svg class="st:w-[16px] st:h-[16px]" viewBox="0 0 600 500" width="20" height="20" fill="#fff">data-v-5f2ce35c=""><path
+            d="m275.565 189.451 223.897 223.897h51.668l-275.565-275.565-275.565 275.565h51.668z"></path></svg>
+      </button>
     </div>
 
 
@@ -200,9 +205,9 @@
         <div
           :class="['st:w-full st:md:w-[20%] st:lg:w-[15%] st:mr-[20px] st:md:bg-[#f5f5f5] st:h-full',
             showMobileFilters ? 'st:block st:fixed st:bg-white st:top-0 st:left-0 st:h-full st:w-full st:z-50' : 'st:hidden st:md:block']">
-          <div class="st:flex st:flex-col st:items-start st:gap-[10px] st:h-full">
+          <div class="st:flex st:flex-col st:items-start st:h-full">
             <div
-              class="st:flex st:items-center st:justify-between st:w-full st:border-b st:border-b-gray-200 st:px-[20px] st:md:px-0 st:pt-[20px] st:md:pt-0 st:pb-[15px]">
+              class="st:flex st:items-center st:justify-between st:w-full st:border-b st:border-b-gray-200 st:px-[20px] st:md:px-0 st:pt-[15px] st:md:pt-0 st:pb-[10px]">
               <h2 class="st:text-[14px] st:font-[400] st:text-[#000000bf]">Filter</h2>
               <button v-if="clearAll" @click="clearFilters"
                 class="st:border-b st:hover:border-b-[2px]  st:cursor-pointer st:text-[14px] st:font-[400] st:text-[#000000bf]">Remove
@@ -210,38 +215,42 @@
             </div>
 
             <div v-for="filter in filters" :key="filter.field" v-show="showFilter(filter)"
-              class="st:w-full st:border-b st:border-b-gray-200 st:pb-[15px] st:px-[20px] st:md:px-0">
-              <div v-if="filter.values.length > 0" @click="filter.isOpen = !filter.isOpen"
-                class="st:flex st:items-center st:justify-between st:cursor-pointer st:my-[10px]">
-                <h2 class="st:text-[14px] st:font-[400] st:text-[#000000bf] st:hover:underline">{{ filter.label }}</h2>
-                <div class="st:flex st:items-center st:gap-[10px]">
-                  <button v-if="filter.selected.length > 0"
-                    @click="clearFilter(filter.field), filter.isOpen = !filter.isOpen"
-                    class="st:text-[14px] st:cursor-pointer">Clear</button>
-                  <svg v-if="filter.isOpen" class="st:w-[14px] st:transition-transform" viewBox="0 0 600 500" width="12"
-                    height="12" fill="#000">
-                    <path d="m275.565 189.451 223.897 223.897h51.668l-275.565-275.565-275.565 275.565h51.668z"></path>
-                  </svg>
-                  <svg v-else class="st:w-[14px] st:transition-transform" viewBox="0 0 600 500" width="12" height="12"
-                    fill="#000">
-                    <path d="m275.565 361.679-223.897-223.896h-51.668l275.565 275.565 275.565-275.565h-51.668z">
-                    </path>
-                  </svg>
+              class="st:w-full st:border-b st:border-b-gray-200 st:pt-[10px] st:px-[20px]  st:md:px-0">
+              <div @click="filter.isOpen = !filter.isOpen" class=" st:pb-[10px] st:cursor-pointer">
+                <div v-if="filter.values.length > 0"
+                  class="st:flex st:items-center st:justify-between st:cursor-pointer st:my-[10px]">
+                  <h2 class="st:text-[14px] st:font-[400] st:text-[#000000bf] st:hover:underline">{{ filter.label }}
+                  </h2>
+                  <div class="st:flex st:items-center st:gap-[10px]">
+                    <button v-if="filter.selected.length > 0"
+                      @click="clearFilter(filter.field), filter.isOpen = !filter.isOpen"
+                      class="st:text-[14px] st:cursor-pointer">Clear</button>
+                    <svg v-if="filter.isOpen" class="st:w-[14px] st:transition-transform" viewBox="0 0 600 500"
+                      width="12" height="12" fill="#000">
+                      <path d="m275.565 189.451 223.897 223.897h51.668l-275.565-275.565-275.565 275.565h51.668z"></path>
+                    </svg>
+                    <svg v-else class="st:w-[14px] st:transition-transform" viewBox="0 0 600 500" width="12" height="12"
+                      fill="#000">
+                      <path d="m275.565 361.679-223.897-223.896h-51.668l275.565 275.565 275.565-275.565h-51.668z">
+                      </path>
+                    </svg>
+                  </div>
                 </div>
               </div>
 
+
               <!-- textFacet -->
               <div v-show="filter.isOpen" :id="`st-${filter.field}-filter`"
-                class="st-filter-container st:max-h-[200px] st:overflow-y-auto">
+                class="st-filter-container st:max-h-[200px] st:overflow-y-auto st:pb-[15px]">
                 <div v-if="filter.type === 'textFacet'">
                   <div v-for="item in filter.values" :key="item.label"
-                    class="st:flex st:gap-[8px] st:items-center st:justify-between st:text-[14px] st:text-[#213555] st:font-[700] st:capitalize">
+                    class="st:flex st:gap-[8px] st:items-center st:justify-start st:text-[14px] st:text-[#213555] st:font-[700] st:capitalize">
 
-                    <label class="st:flex st:gap-[8px] st:cursor-pointer">
+                    <label class="st:flex st:items-center st:justify-start  st:gap-[8px] st:cursor-pointer st:flex-1">
                       <input type="checkbox" :value="item.label" v-model="filter.selected" @change="applyFilters"
                         class="st:hidden">
                       <div
-                        class="st:w-[16px] st:h-[16px] st:border st:border-gray-400 st:rounded-[5px] st:flex st:items-center st:justify-center">
+                        class="st:w-[16px] st:h-[16px] st:border st:border-black st:flex st:items-center st:justify-center">
                         <img src="/src/assets/tick.svg" alt="tick" class="st:w-[15px] st:h-[15px]"
                           v-if="filter.selected.includes(item.label)">
                       </div>
@@ -256,11 +265,11 @@
                   <div v-for="item in filter.values" :key="item.min"
                     class=" st:text-[14px] st:text-[#213555] st:font-[700] st:capitalize">
                     <div v-if="item.count > 0" class="st:flex st:items-center st:justify-between">
-                      <label class="st:flex st:gap-[8px] st:items-center st:cursor-pointer">
+                      <label class="st:flex st:gap-[8px] st:items-center st:justify-center st:cursor-pointer">
                         <input type="checkbox" :value="item" v-model="filter.selected" @change="applyFilters"
                           class="st:hidden">
                         <div
-                          class="st:w-[16px] st:h-[16px] st:border st:border-gray-400 st:rounded-[5px] st:flex st:items-center st:justify-center">
+                          class="st:w-[16px] st:h-[16px] st:border st:border-back st:flex st:items-center st:justify-center">
 
                           <img src="/src/assets/tick.svg" alt="tick" class="st:w-[15px] st:h-[15px]"
                             v-if="filter.selected.some(val => val.min === item.min)">
@@ -284,7 +293,7 @@
             </div>
 
             <!-- Availability -->
-            <div class="st:w-full st:my-[10px] st:flex-1 st:px-[20px] st:md:px-0">
+            <div class="st:w-full st:pt-[15px] st:flex-1 st:px-[20px] st:md:px-0">
               <div @click="showAvailibilty = !showAvailibilty"
                 class="st:flex st:items-center st:justify-between st:mb-[8px] st:cursor-pointer">
                 <h2 class="st:text-[14px] st:font-[400] st:text-[#000000bf] st:hover:underline">Availability</h2>
@@ -296,11 +305,23 @@
               </div>
 
               <div v-if="showAvailibilty">
-                <label class=" st:flex st:items-center st:gap-[8px] st:text-[14px] st:cursor-pointer st:text-[#213555]
+                <!-- <label class=" st:flex st:items-center st:gap-[8px] st:text-[14px] st:cursor-pointer st:text-[#213555]
                 st:font-[700] st:capitalize">
                   <input type="checkbox" v-model="excludeOutOfStock" @change="applyFilters"
                     class="st:w-[16px] st:h-[16px]">
                   Exclude Out of Stock
+                </label> -->
+
+                <label @click="excludeOutOfStock = !excludeOutOfStock"
+                  class="st:flex st:items-center st:justify-center  st:gap-[8px] st:cursor-pointer">
+                  <input type="checkbox" @change="applyFilters" class="st:hidden">
+                  <div
+                    class="st:w-[16px] st:h-[16px] st:border st:border-black st:flex st:items-center st:justify-center">
+                    <img v-if="excludeOutOfStock" src="/src/assets/tick.svg" alt="tick" class="st:w-[15px] st:h-[15px]">
+                  </div>
+                  <span
+                    class="st:flex-1 st:hover:text-black st:hover:underline st:text-[14px] st:text-[#213555]">Exclude
+                    Out of Stock</span>
                 </label>
               </div>
             </div>
@@ -338,10 +359,10 @@
           <!-- dynamicfilters -->
           <div v-if="selectFilters.length > 0"
             class="st:flex st:md:flex-wrap st:w-full st:overflow-x-auto st:items-start st:justify-start st:mt-[20px] st:md:mt-0 st:md:mb-[20px] st:gap-[20px] st:text-[14px] st:font-[500]">
-            <div v-for="(item, index) in selectFilters" :key="index"
+            <div v-for="(item, index) in selectFilters" :key="index" @click="removeFilter(item)"
               class="st:flex st:items-center st:gap-[10px] st:border st:border-gray-400 st:px-[10px] st:py-[5px] st:rounded-full st:cursor-pointer">
               <span class="st:text-nowrap">{{ item.label }}</span>
-              <button @click="removeFilter(item)" class="st:font-[600] st:cursor-pointer">X</button>
+              <button class="st:font-[600] st:cursor-pointer">X</button>
             </div>
           </div>
 
@@ -353,8 +374,6 @@
                   {{ resp.totalHits }}
                 </strong> Result(s) for <strong class="st:font-[700]">"{{ query }}"</strong></span>
             </div>
-
-
 
             <div class="st:hidden st:relative st:md:flex-col st:items-start st:justify-center">
               <div class="st:flex st:text-[14px] st:text-[#000] st:items-center st:justify-between st:w-[230px]">
@@ -406,11 +425,12 @@
 
                 <div
                   class="st:flex st:flex-col st:items-center st:mt-[10px] st:gap-[10px] st:w-full st:flex-1 st:text-center">
-                  <h3 class="st:text-[16px] st:font-[800] st:cursor-pointer st:line-clamp-1 st:hover:underline">
+                  <h3
+                    class="st:text-[15px] st:font-[700] st:cursor-pointer st:line-clamp-2 st:md:line-clamp-1 st:hover:underline st:px-[10px]">
                     {{ value.title }}
                   </h3>
 
-                  <h3 class="st:text-[14px] st:capitalize st:text-[#213555]  st:font-[800]">
+                  <h3 class="st:text-[12px] st:md:text-[14px] st:capitalize st:text-[#213555]  st:font-[800]">
                     {{ value.vendor }}
                   </h3>
 
@@ -425,7 +445,7 @@
 
                   <div class="st:flex st:items-center st:justify-center st:w-full st:mt-[20px]">
                     <button
-                      class="st:text-[15px] st:text-white st:border st:bg-[#213555] st:font-[700] st:w-[90%] st:py-[10px] st:rounded-[10px] st:cursor-pointer">ADD
+                      class="st:text-[12px] st:md:text-[15px] st:text-white st:border st:bg-[#213555] st:font-[700] st:w-[90%] st:py-[8px] st:rounded-[10px] st:cursor-pointer">ADD
                       TO CART</button>
                   </div>
 
