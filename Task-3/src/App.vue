@@ -415,8 +415,8 @@
                 <div class="st:relative st:cursor-pointer">
                   <img v-if="value.image" :src="value.image.src" alt="product"
                     class="st:w-full st:object-cover st:rounded-[6px] st:relative st:hover:opacity-0 st:z-5" />
-                  <img v-if="value.images" :src="value.images[0].src" alt="product"
-                    class="st:w-full st:object-cover st:rounded-[6px] st:absolute st:top-0 st:left-0" />
+                  <!-- <img v-if="value.images" :src="value.images[0].src" alt="product"
+                    class="st:w-full st:object-cover st:rounded-[6px] st:absolute st:top-0 st:left-0" /> -->
 
                   <p v-if="value.discount > 0"
                     class="st:text-[12px] st:text-[#fff] st:font-[400] st:border-[1px] st:bg-red-500 st:absolute st:top-[4px] st:right-[4px] st:md:top-[13.5px]  st:md:right-[10px] st:p-[4px_10px] st:md:p-[5px_13px_6px_13px] st:rounded-full st:z-10 st:mt-0 st:md:mt-[-10px]">
