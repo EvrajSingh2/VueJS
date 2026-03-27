@@ -349,7 +349,7 @@
             <div
               class="st:flex  st:border-b-[1px] st:w-full st:border-gray-300 st:outline-none st:items-center st:justify-start st:py-[12px]">
               <p @click="showMobileSort = false" class="st:text-black st:text-[18px] st:w-1/2">✖</p>
-              <p class="st:text-[18px] st:font-[400] st:w-1/2">SORT BY</p>
+              <p class="st:text-[18px] st:font-[400] st:w-1/2 st:-ml-[40px]">SORT BY</p>
             </div>
             <p class="st:text-[14px] st:capitalize st:letter-spacing:[0.4px]" v-for="sort in sortOptions"
               :key="sort.fields" @click="sortData(sort.fields), showMobileSort = false"
