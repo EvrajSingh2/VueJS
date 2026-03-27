@@ -306,12 +306,6 @@
               </div>
 
               <div v-if="showAvailibilty">
-                <!-- <label class=" st:flex st:items-center st:gap-[8px] st:text-[14px] st:cursor-pointer st:text-[#213555]
-                st:font-[700] st:capitalize">
-                  <input type="checkbox" v-model="excludeOutOfStock" @change="applyFilters"
-                    class="st:w-[16px] st:h-[16px]">
-                  Exclude Out of Stock
-                </label> -->
 
                 <label class="st:flex st:items-center st:justify-center  st:gap-[8px] st:cursor-pointer">
                   <input @click="excludeOutOfStock = !excludeOutOfStock" type="checkbox" @change="applyFilters"
@@ -699,7 +693,6 @@ export default {
       try {
         this.showData();
         this.resp = await this.client.search(this.query, "GXRDI1DDCJYW9MPFLDY3AH38");
-        console.log('api response', this.resp)
         this.results = this.resp.results;
 
 
