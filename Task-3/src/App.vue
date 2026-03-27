@@ -14,13 +14,13 @@
 
 
   <!-- error -->
-  <div v-if="err" class="st:flex st:flex-col st:items-center st:justify-center st:h-[200px] st:gap-[10px]">
+  <div v-show="err" class="st:flex st:flex-col st:items-center st:justify-center st:h-[200px] st:gap-[10px]">
     <p class="st:text-[24px] st:font-[600]">
       It's taking longer than usual. Please check your network connection or try refreshing the page!
     </p>
   </div>
   <!-- no results -->
-  <div v-else-if="notEmptyQuery && !loader && results.length === 0"
+  <div v-show="query.length > 0 && !loader && !err && results.length === 0"
     class="st:flex st:flex-col st:items-center st:justify-center st:h-[200px] st:gap-[10px]">
     <p class="st:text-[24px] st:font-[600]">
       We're sorry. There are no results for '{{ query }}'.
@@ -31,7 +31,7 @@
   </div>
 
 
-  <main v-show="notEmptyQuery && !err && results.length > 0" class=" st:bg-[#f5f5f5]">
+  <main v-show="query.length > 0 && !err && results.length > 0" class=" st:bg-[#f5f5f5]">
 
     <!-- scroll to top -->
     <div v-show="!showMobileFilters && !showMobileSort"
@@ -140,7 +140,7 @@
                           class="st:w-[16px] st:h-[16px] st:border st:border-back st:flex st:items-center st:justify-center">
 
                           <img src="/src/assets/tick.svg" alt="tick" class="st:w-[15px] st:h-[15px]"
-                            v-if="filter.selected.some(val => val.min === item.min)">
+                            v-if="filter.selected.some(val => val.min === value.min)">
                         </div>
 
                         <div v-if="filter.field === 'discounted_price'" class=" st:hover:text-black st:hover:underline">
@@ -243,7 +243,7 @@
 
           <!-- grid -->
           <div v-if="loader"
-            class="st:absolute st:inset-0 st:bg-white/70 st:flex st:justify-center st:items-center st:z-20 st:h-screen">
+            class="st:fixed st:inset-0 st:bg-white/70 st:flex st:justify-center st:items-center st:z-9999">
             <div
               class="st:w-[40px] st:h-[40px] st:border-[4px] st:border-gray-200 st:border-t-gray-500 st:rounded-full st:animate-spin">
             </div>
@@ -256,9 +256,9 @@
 
                 <div class="st:cursor-pointer st:relative">
                   <img v-if="product.image" :src="product.image.src" alt="product"
-                    :class="['st:w-full st:object-cover st:rounded-[6px] st:px-[10px] st:relative', showMobileSort ? 'st:z-0' : 'st:hover:opacity-0 st:z-30']" />
+                    :class="['st:w-full st:h-[250px]  st:object-cover st:rounded-[6px] st:px-[10px] st:relative', showMobileSort ? 'st:z-0' : 'st:hover:opacity-0 st:z-30']" />
                   <img v-if="product.images[0]" :src="product.images[0].src" alt="product"
-                    class="st:w-full st:object-cover st:rounded-[6px] st:px-[10px] st:absolute st:top-0 st:left-0" />
+                    class="st:w-full st:h-[250px] st:object-cover st:rounded-[6px] st:px-[10px] st:absolute st:top-0 st:left-0" />
 
                   <p v-if="product.discount > 0"
                     class="st:text-[12px] st:text-[#fff] st:font-[400] st:border-[1px] st:bg-red-500 st:absolute st:top-[4px] st:right-[4px] st:md:top-[13.5px]  st:md:right-[10px] st:p-[4px_10px] st:md:p-[5px_13px_6px_13px] st:rounded-full st:z-10 st:mt-0 st:md:mt-[-10px]">
@@ -300,9 +300,9 @@
         </div>
 
       </div>
-      <paginate v-if="pageCount > 1" v-model="page" :page-count="pageCount" :page-range="3" :click-handler="handlePages"
-        :prev-text="'<'" :next-text="'>'" :container-class="'pagination'" :page-class="'page-item'"
-        :active-class="'active'">
+      <paginate v-if="pageCount > 1" :modelValue="page" :page-count="pageCount" :page-range="3"
+        :click-handler="handlePages" :prev-text="'<'" :next-text="'>'" :container-class="'pagination'"
+        :page-class="'page-item'" :active-class="'active'">
       </paginate>
       <div v-if="pageCount <= 1 && results.length > 0" class="st:text-center st:text-[16px] st:font-[400] st:py-[20px]">
         No More Results
@@ -415,8 +415,6 @@ export default {
         active: false,
         fields: ['-isActive', 'published_at'],
       }],
-
-      notEmptyQuery: false,
       loader: false,
 
       showDiscountedPrice: false,
@@ -433,7 +431,7 @@ export default {
   },
   methods: {
     showData(skips) {
-      this.notEmptyQuery = true;
+
       this.client.count(this.pageProductCount);
       this.client.skip(skips);
 
@@ -536,11 +534,10 @@ export default {
 
 
     async displayData(skip, pushDataToURL = true) {
-      if (this.query.trim() === "") return this.notEmptyQuery = false;
 
       this.loader = true;
       this.err = null;
-      if (skip === 0) {
+      if (skip === 0 && this.page !== 1) {
         this.page = 1;
       }
 
@@ -553,17 +550,15 @@ export default {
         this.filters.forEach(filter => {
           if (filter.type === 'textFacet') {
             filter.values = this.resp.textFacets[filter.field];
-          }
-          if (filter.type === 'numericFacet') {
-            filter.values = this.resp.numericFacets[filter.field];
-          }
-          if (filter.selected.length > 0) {
-            if (filter.type === "textFacet") {
+            if (filter.selected.length > 0) {
               filter.values.sort((a, b) => {
                 return filter.selected.includes(b.label) - filter.selected.includes(a.label);
               })
             }
-            if (filter.type === "numericFacet") {
+          }
+          else if (filter.type === 'numericFacet') {
+            filter.values = this.resp.numericFacets[filter.field];
+            if (filter.selected.length > 0) {
               filter.values.sort((a, b) => {
                 return filter.selected.some(v => v.max === b.max) - filter.selected.some(v => v.min === a.min);
               })
@@ -595,7 +590,8 @@ export default {
       this.page = pageNum;
       this.scrollToTop();
 
-      this.displayData((this.pagenum - 1) * this.pageProductCount);
+      this.updateUrl();
+      this.displayData((this.page - 1) * this.pageProductCount);
 
     },
 
@@ -651,10 +647,6 @@ export default {
       });
 
       this.sortVal = '';
-
-
-      this.notEmptyQuery = false;
-
       this.client = new SearchClient(
         "8MI7TKTXH4DXQEKRGQQC5WVU",
         "H9VCE36B3E15PXPH277SSJG7"
