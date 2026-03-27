@@ -406,9 +406,9 @@
               <div v-for="value in results" :key="value.id"
                 class="st:bg-white st:rounded-[15px] st:shadow-md st:py-[10px] st:flex st:flex-col st:items-stretch st:tracking-[0.6px]">
 
-                <div class="st:relative st:cursor-pointer">
+                <div class="st:cursor-pointer">
                   <img v-if="value.image" :src="value.image.src" alt="product"
-                    class="st:w-full st:object-cover st:rounded-[6px] st:relative st:hover:opacity-0 st:z-5" />
+                    class="st:w-full st:object-cover st:rounded-[6px] st:px-[10px]" />
                   <!-- <img v-if="value.images" :src="value.images[0].src" alt="product"
                     class="st:w-full st:object-cover st:rounded-[6px] st:absolute st:top-0 st:left-0" /> -->
 
