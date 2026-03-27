@@ -1,13 +1,13 @@
-<template v-if="showMobileSort" class="st:overlay-bacdrop">
+<template>
   <header>
     <img src="/src/assets/header.png" alt="header" class="st:w-full st:hidden st:lg:block">
     <img src="/src/assets/header2.png" alt="header" class="st:w-full st:hidden st:md:block st:lg:hidden">
-    <img src="/src/assets/header3.png" alt="header" class="st:w-full st:md:hidden">
+    <img src="/src/assets/headerphone.png" alt="header" class="st:w-full st:md:hidden">
   </header>
 
   <!-- search -->
-  <div
-    class="st:flex st:items-center st:justify-center st:md:justify-end st:md:items-end st:max-w-[1200px] st:mx-auto st:my-[10px] st:sticky st:top-0 st:bg-white  st:z-40 st:py-[10px] st:md:static">
+  <div :class="['st:flex st:items-center st:justify-center st:md:justify-end st:md:items-end st:max-w-[1200px] st:mx-auto st:my-[10px] st:sticky st:top-0 st:bg-white st:py-[10px] st:md:static',
+    showMobileSort ? 'st:z-0' : 'st:z-40']">
     <input type="text" v-model="query" @input="handleSearch" placeholder="Search product"
       class="st:border st:border-gray-300 st:px-[8px] st:py-[8px] st:w-full st:mx-[20px] st:md:w-[40%] st:outline-none">
   </div>
@@ -20,7 +20,7 @@
     </p>
   </div>
   <!-- no results -->
-  <div v-else-if="showResults && !loader && results.length === 0"
+  <div v-else-if="notEmptyQuery && !loader && results.length === 0"
     class="st:flex st:flex-col st:items-center st:justify-center st:h-[200px] st:gap-[10px]">
     <p class="st:text-[24px] st:font-[600]">
       We're sorry. There are no results for '{{ query }}'.
@@ -31,12 +31,12 @@
   </div>
 
 
-  <main v-else-if="showResults" class=" st:bg-[#f5f5f5]">
+  <main v-show="notEmptyQuery && !err && results.length > 0" class=" st:bg-[#f5f5f5]">
 
     <!-- scroll to top -->
-    <div v-if="!showMobileFilters && !showMobileSort"
+    <div v-show="!showMobileFilters && !showMobileSort"
       class="st:absolute st:bottom-[50px] st:md:bottom-[120px] st:right-[60px] st:md:right-[80px] st:lg:right-[100px]">
-      <button v-if="isVisible" @click="scrollToTop"
+      <button v-if="scrollToTopvisibility" @click="scrollToTop"
         class="st:flex st:items-center st:justify-center st:fixed st:border st:bg-black st:w-[35px] st:h-[35px] st:z-100">
         <svg class="st:w-[16px] st:h-[16px]" viewBox="0 0 600 500" width="20" height="20"
           fill="#fff">data-v-5f2ce35c=""><path
@@ -69,148 +69,15 @@
           </div>
         </div>
 
-
-        <!-- <div class="st:w-full">
-              <div @click="showCollections = !showCollections"
-                class="st:flex st:items-center st:justify-between st:cursor-pointer st:gap-[5px] st:my-[10px]">
-                <div class="st:flex st:items-center st:justify-between st:w-full">
-                  <h2 class="st:text-[16px] st:font-[500]">Collections</h2>
-                  <button v-if="showCollections && selectedCollection.length > 0"
-                    @click="clearFilter('collections'), showCollections = !showCollections"
-                    class="st:cursor-pointer">clear
-                  </button>
-                </div>
-                <svg class="st:w-[14px] " viewBox="0 0 600 500" width="12" height="12" fill="#000">
-                  <path d="m275.565 361.679-223.897-223.896h-51.668l275.565 275.565 275.565-275.565h-51.668z">
-                  </path>
-                </svg>
-              </div>
-              <div v-if="showCollections" class="st:max-h-[200px] st:overflow-y-auto">
-                <div v-for="facet in textFacets.collections" :key="facet.label"
-                  class="st:flex st:justify-between st:gap-[10px] st:text-[14px] st:text-[#213555] st:font-[700]">
-                  <div class="st:flex st:items-start st:gap-[8px]">
-                    <input type="checkbox" :value="facet.label" v-model="selectedCollection" @change="filterData"
-                      class="st:w-[15px] st:h-[15px] st:mt-[3px]">
-                    <span class="st:capitalize ">{{ facet.label }}</span>
-                  </div>
-                  <div class="st:flex st:justify-end">
-                    <span>({{ facet.value }})</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="st:w-full">
-              <div @click="showProductType = !showProductType"
-                class="st:flex st:items-center st:justify-between st:cursor-pointer st:gap-[5px] st:my-[10px]">
-                <div class="st:flex st:items-center st:justify-between st:w-full">
-                  <h2 class="st:text-[16px] st:font-[500]">Product Type</h2>
-                  <button v-if="showProductType && selectedProductType.length > 0"
-                    @click="clearFilter('productType'), showProductType = !showProductType"
-                    class="st:cursor-pointer">clear
-                  </button>
-                </div>
-                <svg class="st:w-[14px] " viewBox="0 0 600 500" width="12" height="12" fill="#000">
-                  <path d="m275.565 361.679-223.897-223.896h-51.668l275.565 275.565 275.565-275.565h-51.668z">
-                  </path>
-                </svg>
-              </div>
-              <div v-if="showProductType" class="st:max-h-[200px] st:overflow-y-auto">
-                <div v-for="facet in textFacets.product_type" :key="facet.label"
-                  class="st:flex st:justify-between st:gap-[10px] st:text-[14px] st:text-[#213555] st:font-[700]">
-                  <div class="st:flex st:gap-[8px] st:items-stretch">
-                    <input type="checkbox" :value="facet.label" v-model="selectedProductType" @change="filterData"
-                      class="st:w-[15px] st:h-[15px] st:mt-[3px]">
-                    <span class="st:capitalize">{{ facet.label }}</span>
-                  </div>
-                  <div class="st:flex st:justify-end">
-                    <span>({{ facet.value }})</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="st:w-full">
-              <div @click="showPrice = !showPrice"
-                class="st:flex st:items-center st:justify-between st:cursor-pointer st:gap-[5px] st:my-[10px]">
-                <div class="st:flex st:items-center st:justify-between st:w-full">
-                  <h2 class="st:text-[16px] st:font-[500]">Price</h2>
-                  <button v-if="showPrice && selectedPrice.length > 0"
-                    @click="clearFilter('price'), showPrice = !showPrice" class="st:cursor-pointer">clear
-                  </button>
-                </div>
-                <svg class="st:w-[14px] st:transition-transform" viewBox="0 0 600 500" width="12" height="12"
-                  fill="#000">
-                  <path d="m275.565 361.679-223.897-223.896h-51.668l275.565 275.565 275.565-275.565h-51.668z">
-                  </path>
-                </svg>
-              </div>
-              <div v-if="showPrice" class="st:max-h-[200px] st:overflow-y-auto">
-                <div v-for="facet in numericFacets.discounted_price" :key="facet.min">
-                  <div v-if="facet.count > 0"
-                    class="st:flex st:justify-between st:gap-[10px] st:text-[14px] st:text-[#213555] st:font-[700]">
-                    <div v-if="facet.min < 300" class="st:flex st:gap-[8px] st:items-stretch">
-                      <input type="checkbox" :value="facet" v-model="selectedPrice" @change="filterData"
-                        class="st:w-[15px] st:h-[15px] st:mt-[3px]">
-                      <span>{{ facet.min }}</span>
-                      <span>- {{ facet.max }}</span>
-                    </div>
-                    <div v-if="facet.min >= 300" class="st:flex st:gap-[8px] st:items-stretch">
-                      <input type="checkbox" :value="facet" v-model="selectedPrice" @change="filterData"
-                        class="st:w-[15px] st:h-[15px] st:mt-[4px]">
-                      <span>{{ facet.min }}</span>
-                      <span> & Above</span>
-                    </div>
-                    <div class="st:flex st:justify-end">
-                      <span>({{ facet.count }})</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="st:w-full">
-              <div @click="showDiscountedPrice = !showDiscountedPrice"
-                class="st:flex st:items-center st:justify-between st:cursor-pointer st:gap-[5px] st:my-[10px]">
-                <div class="st:flex st:items-center st:justify-between st:w-full">
-                  <h2 class="st:text-[16px] st:font-[500]">Discount</h2>
-                  <button v-if="showDiscountedPrice && selectedDiscountedPrice.length > 0"
-                    @click="clearFilter('discountedPrice'), showDiscountedPrice = !showDiscountedPrice"
-                    class="st:cursor-pointer">clear
-                  </button>
-                </div>
-                <svg class="st:w-[14px] st:transition-transform" viewBox="0 0 600 500" width="12" height="12"
-                  fill="#000">
-                  <path d="m275.565 361.679-223.897-223.896h-51.668l275.565 275.565 275.565-275.565h-51.668z">
-                  </path>
-                </svg>
-              </div>
-              <div v-if="showDiscountedPrice" class="st:max-h-[200px] st:overflow-y-auto">
-                <div v-for="facet in numericFacets.discount" :key="facet.min">
-                  <div v-if="facet.count > 0"
-                    class="st:flex st:justify-between st:gap-[10px] st:text-[14px] st:text-[#213555] st:font-[700]">
-                    <div class="st:flex st:gap-[8px] st:items-stretch">
-                      <input type="checkbox" :value="facet" v-model="selectedDiscountedPrice" @change="filterData"
-                        class="st:w-[15px] st:h-[15px] st:mt-[3px]">
-                      <span>{{ facet.max }} % Off Or More</span>
-                    </div>
-                    <div class="st:flex st:justify-end">
-                      <span>({{ facet.count }})</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div> -->
-
         <!-- filters -->
         <div
           :class="['st:w-full st:md:w-[20%] st:lg:w-[15%] st:mr-[20px] st:md:bg-[#f5f5f5] st:h-full',
-            showMobileFilters ? 'st:block st:fixed st:bg-white st:top-0 st:left-0 st:h-full st:w-full st:z-50' : 'st:hidden st:md:block']">
+            showMobileFilters ? 'st:block st:fixed st:bg-white st:top-0 st:left-0 st:h-full st:w-full st:z-200 st:overflow-hidden ' : 'st:hidden st:md:block']">
           <div class="st:flex st:flex-col st:items-start st:h-full">
             <div
               class="st:flex st:items-center st:justify-between st:w-full st:border-b st:border-b-gray-200 st:px-[20px] st:md:px-0 st:pt-[15px] st:md:pt-0 st:pb-[10px]">
               <h2 class="st:text-[14px] st:font-[400] st:text-[#000000bf]">Filter</h2>
-              <button v-if="clearAll" @click="clearFilters"
+              <button v-show="clearAllFilters" @click="clearFilters"
                 class="st:underline st:hover:decoration-2 st:cursor-pointer st:text-[14px] st:font-[400] st:text-[#000000bf]">Remove
                 all</button>
             </div>
@@ -239,35 +106,35 @@
                 </div>
               </div>
 
-
-              <!-- textFacet -->
               <div v-show="filter.isOpen" :id="`st-${filter.field}-filter`"
                 class="st-filter-container st:max-h-[200px] st:overflow-y-auto st:pb-[15px]">
+
+                <!-- textFacet -->
                 <div v-if="filter.type === 'textFacet'">
-                  <div v-for="item in filter.values" :key="item.label"
+                  <div v-for="value in filter.values" :key="value.label"
                     class="st:flex st:gap-[8px] st:items-center st:justify-start st:text-[14px] st:text-[#213555] st:font-[700] st:capitalize">
 
                     <label class="st:flex st:items-center st:justify-start  st:gap-[8px] st:cursor-pointer st:flex-1">
-                      <input type="checkbox" :value="item.label" v-model="filter.selected" @change="applyFilters"
+                      <input type="checkbox" :value="value.label" v-model="filter.selected" @change="applyFilters"
                         class="st:hidden">
                       <div
                         class="st:w-[16px] st:h-[16px] st:border st:border-black st:flex st:items-center st:justify-center">
                         <img src="/src/assets/tick.svg" alt="tick" class="st:w-[15px] st:h-[15px]"
-                          v-if="filter.selected.includes(item.label)">
+                          v-if="filter.selected.includes(value.label)">
                       </div>
-                      <span class="st:flex-1 st:hover:text-black st:hover:underline">{{ item.label }}</span>
+                      <span class="st:flex-1 st:hover:text-black st:hover:underline">{{ value.label }}</span>
                     </label>
-                    <span>({{ item.value }})</span>
+                    <span>({{ value.value }})</span>
                   </div>
                 </div>
 
                 <!-- numericFacet -->
                 <div v-if="filter.type === 'numericFacet'">
-                  <div v-for="item in filter.values" :key="item.min"
+                  <div v-for="value in filter.values" :key="value.min"
                     class=" st:text-[14px] st:text-[#213555] st:font-[700] st:capitalize">
-                    <div v-if="item.count > 0" class="st:flex st:items-center st:justify-between">
+                    <div v-if="value.count > 0" class="st:flex st:items-center st:justify-between">
                       <label class="st:flex st:gap-[8px] st:items-center st:justify-center st:cursor-pointer">
-                        <input type="checkbox" :value="item" v-model="filter.selected" @change="applyFilters"
+                        <input type="checkbox" :value="value" v-model="filter.selected" @change="applyFilters"
                           class="st:hidden">
                         <div
                           class="st:w-[16px] st:h-[16px] st:border st:border-back st:flex st:items-center st:justify-center">
@@ -277,51 +144,44 @@
                         </div>
 
                         <div v-if="filter.field === 'discounted_price'" class=" st:hover:text-black st:hover:underline">
-                          <span v-if="item.min === 0">Below ${{ item.max }}</span>
-                          <span v-else-if="item.min === 401">${{ item.min }} & Above</span>
-                          <span v-else>${{ item.min }} - ${{ item.max }}</span>
+                          <span v-if="value.min === 0">Below ${{ value.max }}</span>
+                          <span v-else-if="value.min === 401">${{ value.min }} & Above</span>
+                          <span v-else>${{ value.min }} - ${{ value.max }}</span>
                         </div>
                         <div v-else-if="filter.field === 'discount'">
-                          <span class=" st:hover:text-black st:hover:underline">{{ item.min }}% Off Or More</span>
+                          <span class=" st:hover:text-black st:hover:underline">{{ value.min }}% Off Or More</span>
                         </div>
                       </label>
 
-                      <span>({{ item.count }})</span>
+                      <span>({{ value.count }})</span>
                     </div>
+                  </div>
+                </div>
+
+                <!-- Single Facet Availibility -->
+                <div v-if="filter.type === 'singleFacet'">
+                  <div v-for="value in filter.values" :key="value"
+                    class="st:flex st:gap-[8px] st:items-center st:text-[14px] st:font-[700]">
+                    <label class="st:flex st:items-center st:gap-[8px] st:cursor-pointer">
+                      <input type="checkbox" :value="value" v-model="filter.selected" @change="applyFilters"
+                        class="st:hidden">
+
+                      <div
+                        class="st:w-[16px] st:h-[16px] st:border st:border-black st:flex st:items-center st:justify-center">
+                        <img src="/src/assets/tick.svg" alt="tick" v-if="filter.selected.includes(value)"
+                          class="st:w-[15px]">
+                      </div>
+                      <span
+                        class="st:flex-1 st:hover:text-black st:hover:underline st:text-[14px] st:text-[#213555] st:font-[700]">
+                        {{ value }}</span>
+                    </label>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Availability -->
-            <div class="st:w-full st:pt-[15px] st:flex-1 st:px-[20px] st:md:px-0">
-              <div @click="showAvailibilty = !showAvailibilty"
-                class="st:flex st:items-center st:justify-between st:mb-[8px] st:cursor-pointer">
-                <h2 class="st:text-[14px] st:font-[400] st:text-[#000000bf] st:hover:underline">Availability</h2>
-                <svg class="st:w-[14px] st:transition-transform" viewBox="0 0 600 500" width="12" height="12"
-                  fill="#000">
-                  <path d="m275.565 361.679-223.897-223.896h-51.668l275.565 275.565 275.565-275.565h-51.668z">
-                  </path>
-                </svg>
-              </div>
-
-              <div v-if="showAvailibilty">
-
-                <label class="st:flex st:items-center st:justify-center  st:gap-[8px] st:cursor-pointer">
-                  <input @click="excludeOutOfStock = !excludeOutOfStock" type="checkbox" @change="applyFilters"
-                    class="st:hidden">
-                  <div
-                    class="st:w-[16px] st:h-[16px] st:border st:border-black st:flex st:items-center st:justify-center">
-                    <img v-if="excludeOutOfStock" src="/src/assets/tick.svg" alt="tick" class="st:w-[15px] st:h-[15px]">
-                  </div>
-                  <span
-                    class="st:flex-1 st:hover:text-black st:hover:underline st:text-[14px] st:text-[#213555] st:font-[700]">Exclude
-                    Out of Stock</span>
-                </label>
-              </div>
-            </div>
-
-            <div class="st:flex st:md:hidden st:items-center st:justify-center st:w-full">
+            <div
+              class="st:flex st:md:hidden st:items-center st:justify-center st:w-full st:mt-auto st:sticky st:bottom-0 st:z-50u">
               <button @click="showMobileFilters = false"
                 class="st:border st:w-1/2 st:py-[10px] st:border-gray-300 st:font-[700]">Close</button>
               <button @click="showMobileFilters = false"
@@ -339,15 +199,14 @@
           </div>
           <!-- mobileSort -->
           <div
-            :class="['st:flex st:flex-col st:md:hidden st:bg-white st:w-full st:h-fit st:px-[20px] st:gap-[15px] st:pb-[20px]', showMobileSort ? 'st:fixed st:bottom-0 st:left-0 st:z-30' : 'st:hidden']">
+            :class="['st:flex st:flex-col st:md:hidden st:bg-white st:w-full st:h-fit st:px-[20px] st:gap-[15px] st:pb-[20px]', showMobileSort ? 'st:fixed st:bottom-0 st:left-0 st:z-100' : 'st:hidden']">
             <div
               class="st:flex  st:border-b-[1px] st:w-full st:border-gray-300 st:outline-none st:items-center st:justify-start st:py-[12px]">
               <p @click="showMobileSort = false" class="st:text-black st:text-[18px] st:w-1/2">✖</p>
               <p class="st:text-[18px] st:font-[400] st:w-1/2 st:-ml-[40px]">SORT BY</p>
             </div>
             <p class="st:text-[14px] st:capitalize st:letter-spacing:[0.4px]" v-for="sort in sortOptions"
-              :key="sort.fields" @click="sortData(sort.fields), showMobileSort = false"
-              :class="{ 'active-sort': sortVal === sort.fields }">{{
+              :key="sort.fields" @click="sortData(sort.fields)" :class="{ 'active-sort': sortVal === sort.fields }">{{
                 sort.label }}</p>
           </div>
 
@@ -370,17 +229,6 @@
                 </strong> Result(s) for <strong class="st:font-[700]">"{{ query }}"</strong></span>
             </div>
 
-            <div class="st:hidden st:relative st:md:flex-col st:items-start st:justify-center">
-              <div class="st:flex st:text-[14px] st:text-[#000] st:items-center st:justify-between st:w-[230px]">
-                <p>Sort by: <span class="st:pl-[20px] st:cursor-pointer ">Relevance</span></p>
-
-                <svg class="st:w-[15px]" viewBox="0 0 600 500" width="12" height="12" fill="#000">
-                  <path d="m275.565 361.679-223.897-223.896h-51.668l275.565 275.565 275.565-275.565h-51.668z"></path>
-                </svg>
-              </div>
-
-            </div>
-
             <!-- sorting -->
             <div class="st:hidden st:md:flex st:items-center st:justify-center">
               <label class="st:text-[14px]">Sort By:</label>
@@ -395,7 +243,7 @@
 
           <!-- grid -->
           <div v-if="loader"
-            class="st:absolute st:inset-0 st:bg-white/70 st:flex st:justify-center st:items-center st:z-20">
+            class="st:absolute st:inset-0 st:bg-white/70 st:flex st:justify-center st:items-center st:z-20 st:h-screen">
             <div
               class="st:w-[40px] st:h-[40px] st:border-[4px] st:border-gray-200 st:border-t-gray-500 st:rounded-full st:animate-spin">
             </div>
@@ -403,18 +251,18 @@
 
           <div class="st:relative">
             <div class="st:grid st:grid-cols-2 st:md:grid-cols-3 st:lg:grid-cols-4 st:gap-[30px_10px] st:md:my-[10px]">
-              <div v-for="value in results" :key="value.id"
+              <div v-for="product in results" :key="product.id"
                 class="st:bg-white st:rounded-[15px] st:shadow-md st:py-[10px] st:flex st:flex-col st:items-stretch st:tracking-[0.6px]">
 
-                <div class="st:cursor-pointer">
-                  <img v-if="value.image" :src="value.image.src" alt="product"
-                    class="st:w-full st:object-cover st:rounded-[6px] st:px-[10px]" />
-                  <!-- <img v-if="value.images" :src="value.images[0].src" alt="product"
-                    class="st:w-full st:object-cover st:rounded-[6px] st:absolute st:top-0 st:left-0" /> -->
+                <div class="st:cursor-pointer st:relative">
+                  <img v-if="product.image" :src="product.image.src" alt="product"
+                    :class="['st:w-full st:object-cover st:rounded-[6px] st:px-[10px] st:relative', showMobileSort ? 'st:z-0' : 'st:hover:opacity-0 st:z-30']" />
+                  <img v-if="product.images[0]" :src="product.images[0].src" alt="product"
+                    class="st:w-full st:object-cover st:rounded-[6px] st:px-[10px] st:absolute st:top-0 st:left-0" />
 
-                  <p v-if="value.discount > 0"
+                  <p v-if="product.discount > 0"
                     class="st:text-[12px] st:text-[#fff] st:font-[400] st:border-[1px] st:bg-red-500 st:absolute st:top-[4px] st:right-[4px] st:md:top-[13.5px]  st:md:right-[10px] st:p-[4px_10px] st:md:p-[5px_13px_6px_13px] st:rounded-full st:z-10 st:mt-0 st:md:mt-[-10px]">
-                    {{ value.discount }}% OFF
+                    {{ product.discount }}% OFF
                   </p>
                 </div>
 
@@ -422,20 +270,21 @@
                   class="st:flex st:flex-col st:items-center st:mt-[10px] st:gap-[10px] st:w-full st:flex-1 st:text-center">
                   <h3
                     class="st:text-[15px] st:font-[700] st:cursor-pointer st:line-clamp-2 st:md:line-clamp-1 st:hover:underline st:px-[10px]">
-                    {{ value.title }}
+                    {{ product.title }}
                   </h3>
 
                   <h3 class="st:text-[12px] st:md:text-[14px] st:capitalize st:text-[#213555]  st:font-[800]">
-                    {{ value.vendor }}
+                    {{ product.vendor }}
                   </h3>
 
-                  <p v-if="value.discount === 0" class="st:text-[16px] st:font-[600] st:flex-1">
-                    $ {{ value.price }}
-                  </p>
-                  <div v-if="value.discount > 0"
-                    class="st:flex st:items-center st:justify-between st:gap-[10px] st:flex-1">
-                    <p class="st:text-[13px] st:font-[700] st:line-through">$ {{ value.price }}</p>
-                    <p class="st:text-[16px] st:font-[700] st:text-red-500">$ {{ value.discounted_price }}</p>
+                  <!-- <p v-show="value.discount === 0" class="st:text-[16px] st:font-[600] st:flex-1">
+                    $ {{ value.discounted_price }}
+                  </p> -->
+                  <div class="st:flex st:items-center st:justify-between st:gap-[10px] st:flex-1">
+                    <p class="st:text-[13px] st:font-[700] st:line-through" v-if="product.discount > 0">$ {{
+                      product.price }}</p>
+                    <p :class="[`st:text-[16px] st:font-[700]`, { 'st:text-red-500': product.discount > 0 }]">$ {{
+                      product.discounted_price }}</p>
                   </div>
 
                   <div class="st:flex st:items-center st:justify-center st:w-full st:mt-[20px]">
@@ -473,9 +322,7 @@
 <script>
 
 import SearchClient from "@searchtap/search-client";
-import { SortValue } from "./types";
 import Paginate from "vuejs-paginate-next";
-import { def } from "@vue/shared";
 export default {
   components: {
     Paginate
@@ -486,8 +333,8 @@ export default {
     return {
       client: searchClient,
       results: [],
-      query: "",
       page: 1,
+      query: "",
       resp: {},
 
       filters: [{
@@ -522,9 +369,15 @@ export default {
         selected: [],
         isOpen: false
       },
+      {
+        field: 'availability',
+        label: 'Availibility',
+        type: 'singleFacet',
+        values: ['Exclude out of Stock'],
+        selected: [],
+        isOpen: false,
+      }
       ],
-      excludeOutOfStock: false,
-      showAvailibilty: false,
 
       sortVal: '',
       sortOptions: [{
@@ -563,27 +416,26 @@ export default {
         fields: ['-isActive', 'published_at'],
       }],
 
-      showResults: false,
+      notEmptyQuery: false,
       loader: false,
 
       showDiscountedPrice: false,
-      isVisible: false,
+      scrollToTopvisibility: false,
 
       showMobileFilters: false,
       showMobileSort: false,
 
-      clearAll: false,
+      clearAllFilters: false,
+      pageProductCount: 32,
 
       err: null,
     }
   },
   methods: {
-    showData() {
-      this.showResults = true;
-      this.client = new SearchClient("8MI7TKTXH4DXQEKRGQQC5WVU", "H9VCE36B3E15PXPH277SSJG7");
-      this.client.count(32);
-      this.client.skip((this.page - 1) * 32);
-
+    showData(skips) {
+      this.notEmptyQuery = true;
+      this.client.count(this.pageProductCount);
+      this.client.skip(skips);
 
       this.client.textFacets('product_type', 'collections');
       this.client.numericFacets('discounted_price', [
@@ -661,37 +513,39 @@ export default {
         })
       }
 
-      this.filters.forEach(filter => {
+      this.filters.filter(selectFilter => selectFilter.selected.length > 0).forEach(filter => {
 
         document.querySelector(`#st-${filter.field}-filter`)?.scrollTo({ top: 0, behavior: "smooth" })
 
-        if (filter.type === 'textFacet' && filter.selected.length > 0) {
+        if (filter.type === 'textFacet') {
           this.client.textFacetFilters(filter.field, filter.selected);
         }
 
-        if (filter.type === 'numericFacet' && filter.selected.length > 0) {
+        else if (filter.type === 'numericFacet') {
           filter.selected.forEach(val => {
             this.client.numericFacetFilters(filter.field, val.min, val.max);
           });
         }
+
+        else if (filter.type === 'singleFacet') {
+          this.client.filter("isActive=1");
+        }
+
       });
-
-
-      if (this.excludeOutOfStock) {
-        this.client.filter("isActive=1");
-      }
-
     },
 
 
-    async displayData() {
-      if (this.query.trim() === "") return this.showResults = false;
+    async displayData(skip, pushDataToURL = true) {
+      if (this.query.trim() === "") return this.notEmptyQuery = false;
+
       this.loader = true;
       this.err = null;
-
+      if (skip === 0) {
+        this.page = 1;
+      }
 
       try {
-        this.showData();
+        this.showData(skip);
         this.resp = await this.client.search(this.query, "GXRDI1DDCJYW9MPFLDY3AH38");
         this.results = this.resp.results;
 
@@ -717,34 +571,32 @@ export default {
           }
         })
 
-        this.clearAll = this.filters.some(filter => filter.selected.length > 0);
+        this.clearAllFilters = this.filters.some(filter => filter.selected.length > 0);
       } catch (err) {
         this.err = "Something went wrong. Please try again.";
         console.error(this.err, err);
         this.results = [];
       } finally {
         this.loader = false;
+        if (pushDataToURL)
+          this.updateUrl();
       }
     },
     sortData(sortParam = null) {
       if (sortParam)
         this.sortVal = sortParam;
-      this.page = 1;
-      this.displayData();
-      this.updateUrl();
+      this.showMobileSort = false;
+      this.displayData(0);
+
     },
-    applyFilters() {
-      this.page = 1;
-      this.displayData();
-      this.updateUrl();
-    },
+
 
     handlePages(pageNum) {
       this.page = pageNum;
       this.scrollToTop();
 
-      this.displayData();
-      this.updateUrl();
+      this.displayData((this.pagenum - 1) * this.pageProductCount);
+
     },
 
     clearFilters() {
@@ -752,9 +604,8 @@ export default {
         filter.selected = [];
       })
 
-      this.page = 1;
-      this.displayData();
-      this.updateUrl();
+      this.displayData(0);
+
     },
 
     clearFilter(filterName) {
@@ -764,8 +615,8 @@ export default {
         }
       })
 
-      this.displayData();
-      this.updateUrl();
+      this.displayData(0);
+
     },
 
     removeFilter(item) {
@@ -774,8 +625,11 @@ export default {
           if (filter.type === 'textFacet') {
             filter.selected = filter.selected.filter(v => v !== item.value);
           }
-          if (filter.type === 'numericFacet') {
+          else if (filter.type === 'numericFacet') {
             filter.selected = filter.selected.filter(v => v.min !== item.value.min);
+          }
+          else if (filter.type === 'singleFacet') {
+            filter.selected = [];
           }
         }
       });
@@ -788,15 +642,18 @@ export default {
 
       this.filters.forEach(filter => {
         filter.selected = [];
-        filter.values = [];
         filter.isOpen = false;
+        if (filter.type === 'singleFacet') {
+          filter.values = ['Exclude out of Stock'];
+        } else {
+          filter.values = [];
+        }
       });
 
       this.sortVal = '';
 
-      this.page = 1;
 
-      this.showResults = false;
+      this.notEmptyQuery = false;
 
       this.client = new SearchClient(
         "8MI7TKTXH4DXQEKRGQQC5WVU",
@@ -813,20 +670,19 @@ export default {
       } else {
         this.sortVal = this.defaultSort;
         this.clearFilters();
-        this.displayData();
-        // this.updateUrl();
+        this.displayData(0);
       }
     },
 
     handleScroll() {
-      if (window.scrollY > 1000) this.isVisible = true;
-      else this.isVisible = false;
+      this.scrollToTopvisibility = window.scrollY > 1000;
 
       if (document.activeElement.tagName === 'INPUT') {
         document.activeElement.blur();
       }
 
     },
+
     scrollToTop() {
       window.scrollTo({
         top: 0,
@@ -847,8 +703,6 @@ export default {
           params.set(filter.field, JSON.stringify(filter.selected));
         }
       });
-
-      if (this.excludeOutOfStock) params.set("available", "1");
 
       const newUrl = `${window.location.pathname}?${params.toString()}`;
 
@@ -873,6 +727,16 @@ export default {
     selectFilters() {
       let showFilter = [];
       this.filters.forEach(filter => {
+        if (filter.type === 'singleFacet') {
+          filter.selected.forEach(val => {
+            showFilter.push({
+              field: filter.field,
+              value: val,
+              label: `${filter.label} : ${val}`
+            });
+          });
+        }
+
         if (filter.type === 'textFacet') {
           filter.selected.forEach(val => {
             showFilter.push({
@@ -902,17 +766,22 @@ export default {
           });
         }
       });
-
       return showFilter;
     },
+
     defaultSort() {
       return this.sortOptions.find(sort => sort.active).fields;
     },
+
     pageCount() {
       if (!this.resp.totalHits) return 0;
 
       return Math.ceil(this.resp.totalHits / 32);
-    }
+    },
+
+    applyFilters() {
+      this.displayData(0);
+    },
   },
   mounted() {
     window.addEventListener('scroll', this.handleScroll);
@@ -923,9 +792,9 @@ export default {
 
     this.query = params.get("q") || "";
     this.page = Number(params.get("page")) || 1;
-    const sortt = this.sortOptions.find(sort => sort.label === params.get("sort"));
+    const sortParameter = this.sortOptions.find(sort => sort.label === params.get("sort"));
 
-    this.sortVal = sortt ? sortt.fields : this.defaultSort;
+    this.sortVal = sortParameter ? sortParameter.fields : this.defaultSort;
 
     this.filters.forEach(filter => {
       const val = params.get(filter.field);
@@ -934,10 +803,8 @@ export default {
       }
     });
 
-    this.excludeOutOfStock = params.get("available") === "1";
-
     if (this.query) {
-      this.displayData();
+      this.displayData((this.page - 1) * this.pageProductCount);
     }
 
     window.addEventListener("popstate", (event) => {
@@ -947,9 +814,9 @@ export default {
       else {
         this.query = state.q || "";
         this.page = Number(state.page) || 1;
-        const sortt = this.sortOptions.find(sort => sort.label === state.sort);
+        const sortParameter = this.sortOptions.find(sort => sort.label === state.sort);
 
-        this.sortVal = sortt ? sortt.fields : this.defaultSort;
+        this.sortVal = sortParameter ? sortParameter.fields : this.defaultSort;
 
         this.filters.forEach(filter => {
           if (state[filter.field]) {
@@ -958,8 +825,7 @@ export default {
             filter.selected = [];
           }
         });
-        this.excludeOutOfStock = state.stock === "1";
-        this.displayData();
+        this.displayData((this.page - 1) * this.pageProductCount, false);
       }
     });
     this.filters.forEach(filter => {
