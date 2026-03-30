@@ -56,6 +56,13 @@
       </p>
     </div>
 
+    <!-- loader -->
+    <div v-if="loader" class="st:fixed st:inset-0 st:bg-white/70 st:flex st:justify-center st:items-center st:z-9999">
+      <div
+        class="st:w-[40px] st:h-[40px] st:border-[4px] st:border-gray-200 st:border-t-gray-500 st:rounded-full st:animate-spin">
+      </div>
+    </div>
+
 
     <div v-if="!err" class="st:max-w-[1500px] st:mx-auto st:pt-[10px] st:md:pt-[50px]">
       <div v-show="!err && results.length > 0"
@@ -266,15 +273,7 @@
             </div>
           </div>
 
-
           <!-- grid -->
-          <div v-if="loader"
-            class="st:fixed st:inset-0 st:bg-white/70 st:flex st:justify-center st:items-center st:z-9999">
-            <div
-              class="st:w-[40px] st:h-[40px] st:border-[4px] st:border-gray-200 st:border-t-gray-500 st:rounded-full st:animate-spin">
-            </div>
-          </div>
-
           <div class="st:relative">
             <div class="st:grid st:grid-cols-2 st:md:grid-cols-3 st:lg:grid-cols-4 st:gap-[30px_10px] st:md:my-[10px]">
               <div v-for="product in results" :key="product.id"
