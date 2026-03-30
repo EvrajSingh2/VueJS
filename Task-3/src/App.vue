@@ -31,7 +31,7 @@
   </div>
 
 
-  <main v-show="query.length > 0 && !err && results.length > 0" class=" st:bg-[#f5f5f5]">
+  <main v-if="!err" class=" st:bg-[#f5f5f5]">
 
     <!-- scroll to top -->
     <div v-show="!showMobileFilters && !showMobileSort"
@@ -70,7 +70,7 @@
         </div>
 
         <!-- filters -->
-        <div
+        <div v-show="results.length > 0"
           :class="['st:w-full st:md:w-[20%] st:lg:w-[15%] st:mr-[20px] st:md:bg-[#f5f5f5] st:h-full',
             showMobileFilters ? 'st:block st:fixed st:bg-white st:top-0 st:left-0 st:h-full st:w-full st:z-200 st:overflow-hidden ' : 'st:hidden st:md:block']">
           <div class="st:flex st:flex-col st:items-start st:h-full">
@@ -195,7 +195,8 @@
         <div class="st:w-full st:md:w-[80%] st:lg:w-[85%] st:items-start st:pb-[8px]">
 
 
-          <div v-if="showMobileSort" @click="showMobileSort = false" class="st:fixed st:z-20 st:inset-0 st:bg-black/50">
+          <div v-if="showMobileSort" @click="showMobileSort = false"
+            class="st:fixed st:z-500 st:inset-0 st:bg-black/50">
           </div>
           <!-- mobileSort -->
           <div
@@ -220,7 +221,8 @@
             </div>
           </div>
 
-          <div class="st:flex st:items-center st:justify-between st:w-full st:pb-[10px] st:px-[5px] st:md:px-[10px]">
+          <div v-show="results.length > 0"
+            class="st:flex st:items-center st:justify-between st:w-full st:pb-[10px] st:px-[5px] st:md:px-[10px]">
             <div class="st:my-[20px] st:md:my-0">
               <span
                 class="st:text-[14px] st:text-[#000] st:font-[400] st:letter-spacing:[0.6px] st:opacity-[0.7] st:pt-[13px] st:md:pt-0">Showing
@@ -256,8 +258,10 @@
 
                 <div class="st:cursor-pointer st:relative">
                   <img v-if="product.image" :src="product.image.src" alt="product"
-                    :class="['st:w-full st:h-[250px]  st:object-cover st:rounded-[6px] st:px-[10px] st:relative', showMobileSort ? 'st:z-0' : 'st:hover:opacity-0 st:z-30']" />
-                  <img v-if="product.images[0]" :src="product.images[0].src" alt="product"
+                    class="st:w-full st:h-[250px] st:object-cover st:rounded-[6px] st:px-[10px] st:relative st:hover:opacity-0 st:z-30" />
+                  <img v-if="product.images[1]" :src="product.images[1].src" alt="product"
+                    class="st:w-full st:h-[250px] st:object-cover st:rounded-[6px] st:px-[10px] st:absolute st:top-0 st:left-0" />
+                  <img v-else-if="product.images[0]" :src="product.images[0].src" alt="product"
                     class="st:w-full st:h-[250px] st:object-cover st:rounded-[6px] st:px-[10px] st:absolute st:top-0 st:left-0" />
 
                   <p v-if="product.discount > 0"
@@ -283,7 +287,7 @@
                   <div class="st:flex st:items-center st:justify-between st:gap-[10px] st:flex-1">
                     <p class="st:text-[13px] st:font-[700] st:line-through" v-if="product.discount > 0">$ {{
                       product.price }}</p>
-                    <p :class="[`st:text-[16px] st:font-[700]`, { 'st:text-red-500': product.discount > 0 }]">$ {{
+                    <p :class="[`st:text-[16px] st:font-[700]`, { ' st:text-red-500': product.discount > 0 }]">$ {{
                       product.discounted_price }}</p>
                   </div>
 
@@ -416,6 +420,7 @@ export default {
         fields: ['-isActive', 'published_at'],
       }],
       loader: false,
+      initialLoading: true,
 
       showDiscountedPrice: false,
       scrollToTopvisibility: false,
@@ -535,7 +540,9 @@ export default {
 
     async displayData(skip, pushDataToURL = true) {
 
-      this.loader = true;
+      if (this.initialLoading) {
+        this.loader = true;
+      }
       this.err = null;
       if (skip === 0 && this.page !== 1) {
         this.page = 1;
@@ -545,6 +552,7 @@ export default {
         this.showData(skip);
         this.resp = await this.client.search(this.query, "GXRDI1DDCJYW9MPFLDY3AH38");
         this.results = this.resp.results;
+        console.log("resp", this.resp);
 
 
         this.filters.forEach(filter => {
@@ -573,6 +581,7 @@ export default {
         this.results = [];
       } finally {
         this.loader = false;
+        this.initialLoading = false;
         if (pushDataToURL)
           this.updateUrl();
       }
@@ -659,10 +668,10 @@ export default {
         window.history.pushState(
           {}, "", window.location.pathname);
         this.showMobileSort = false;
+        this.initialLoading = true;
       } else {
         this.sortVal = this.defaultSort;
         this.clearFilters();
-        this.displayData(0);
       }
     },
 
