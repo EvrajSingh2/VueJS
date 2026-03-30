@@ -6,32 +6,21 @@
   </header>
 
   <!-- search -->
-  <div :class="['st:flex st:items-center st:justify-center st:md:justify-end st:md:items-end st:max-w-[1200px] st:mx-auto st:my-[10px] st:sticky st:top-0 st:bg-white st:py-[10px] st:md:static',
+  <div :class="['st:flex st:items-center st:justify-center st:md:justify-end st:md:items-end st:max-w-[1200px] st:relative st:mx-auto st:my-[10px] st:sticky st:top-0 st:bg-white st:py-[10px] st:md:static',
     showMobileSort ? 'st:z-0' : 'st:z-40']">
-    <input type="text" v-model="query" @input="handleSearch" placeholder="Search product"
-      class="st:border st:border-gray-300 st:px-[8px] st:py-[8px] st:w-full st:mx-[20px] st:md:w-[40%] st:outline-none">
+    <div
+      class="st:w-full st:mx-[20px] st:md:w-[40%] st:flex st:justify-between st:items-center st:gap-[10px] st:border st:border-gray-300 st:px-[8px] st:py-[8px] st:outline-none">
+      <input type="text" v-model="query" @input="handleSearch" placeholder="Search product"
+        class=" st:w-full st:outline-none">
+      <img v-if="query.length > 0" @click="clearSearch" src="/src/assets/cross.svg" alt="cross"
+        class="st:w-[20px] st:cursor-pointer">
+    </div>
+
   </div>
 
 
-  <!-- error -->
-  <div v-show="err" class="st:flex st:flex-col st:items-center st:justify-center st:h-[200px] st:gap-[10px]">
-    <p class="st:text-[24px] st:font-[600]">
-      It's taking longer than usual. Please check your network connection or try refreshing the page!
-    </p>
-  </div>
-  <!-- no results -->
-  <div v-show="query.length > 0 && !loader && !err && results.length === 0"
-    class="st:flex st:flex-col st:items-center st:justify-center st:h-[200px] st:gap-[10px]">
-    <p class="st:text-[24px] st:font-[600]">
-      We're sorry. There are no results for '{{ query }}'.
-    </p>
-    <p class="st:text-[20px]">
-      Please check the spelling or try again with a less specific or different term.
-    </p>
-  </div>
 
-
-  <main v-if="!err" class=" st:bg-[#f5f5f5]">
+  <main class=" st:bg-[#f5f5f5] st:pt-[40px]">
 
     <!-- scroll to top -->
     <div v-show="!showMobileFilters && !showMobileSort"
@@ -44,9 +33,33 @@
       </button>
     </div>
 
+    <!-- error -->
+    <div v-show="err && query.length > 0"
+      class="st:flex st:flex-col st:items-center st:justify-center st:gap-[10px] st:text-center st:px-[40px]">
+      <div class="st:flex st:justify-center st:items-center st:z-9999">
+        <div
+          class="st:w-[40px] st:h-[40px] st:border-[2px] st:border-gray-200 st:border-t-gray-500 st:rounded-full st:animate-spin">
+        </div>
+      </div>
+      <p class="st:text-[16px] st:font-[400] st:text-[#000000BF] st:letter-spacing:[0.6px]">
+        It's taking longer than usual. Please check your network connection or try refreshing the page!
+      </p>
+    </div>
+    <!-- no results -->
+    <div v-show="query.length > 0 && !loader && !err && results.length === 0"
+      class="st:flex st:flex-col st:items-center st:justify-center st:gap-[10px] st:max-w-[1500px] st:px-[20px] st:mx-auto st:text-center">
+      <p class="st:text-[25px] st:md:text-[30px] st:font-[600] st:break-all">
+        We're sorry. There are no results for '{{ query }}'.
+      </p>
+      <p class="st:text-[15px] st:md:text-[20px] st:text-[#777777]">
+        Please check the spelling or try again with a less specific or different term.
+      </p>
+    </div>
 
-    <div class="st:max-w-[1500px] st:mx-auto st:pt-[10px] st:md:pt-[50px]">
-      <div class="st:flex st:flex-col st:md:flex-row st:w-full st:px-[15px] st:md:px-[50px]">
+
+    <div v-if="!err" class="st:max-w-[1500px] st:mx-auto st:pt-[10px] st:md:pt-[50px]">
+      <div v-show="!err && results.length > 0"
+        class="st:flex st:flex-col st:md:flex-row st:w-full st:px-[15px] st:md:px-[50px]">
         <div
           class="st:flex st:md:hidden st:w-full st:items-center st:justify-center  st:gap-[20px] st:px-[5px] st:cursor-pointer">
           <div @click="showMobileFilters = true"
@@ -114,17 +127,22 @@
                   <div v-for="value in filter.values" :key="value.label"
                     class="st:flex st:gap-[8px] st:items-center st:justify-start st:text-[14px] st:text-[#213555] st:font-[700] st:capitalize">
 
-                    <label class="st:flex st:items-center st:justify-start  st:gap-[8px] st:cursor-pointer st:flex-1">
-                      <input type="checkbox" :value="value.label" v-model="filter.selected" @change="applyFilters"
-                        class="st:hidden">
-                      <div
-                        class="st:w-[16px] st:h-[16px] st:border st:border-black st:flex st:items-center st:justify-center">
-                        <img src="/src/assets/tick.svg" alt="tick" class="st:w-[15px] st:h-[15px]"
-                          v-if="filter.selected.includes(value.label)">
+                    <label v-if="value.label != 'teenage mutant ninja turtles'"
+                      class="st:flex st:w-full st:items-center st:justify-between st:gap-[8px] st:cursor-pointer">
+                      <div class="st:flex st:items-center st:gap-[8px]">
+                        <input type="checkbox" :value="value.label" v-model="filter.selected" @change="applyFilters"
+                          class="st:hidden">
+
+                        <div
+                          class="st:w-[16px] st:h-[16px] st:border st:border-black st:flex st:items-center st:justify-center">
+                          <img src="/src/assets/tick.svg" alt="tick" class="st:w-[15px] st:h-[15px]"
+                            v-if="filter.selected.includes(value.label)">
+                        </div>
+
+                        <span class="st:hover:text-black st:hover:underline">{{ value.label }}</span>
                       </div>
-                      <span class="st:flex-1 st:hover:text-black st:hover:underline">{{ value.label }}</span>
+                      <span>({{ value.value }})</span>
                     </label>
-                    <span>({{ value.value }})</span>
                   </div>
                 </div>
 
@@ -133,27 +151,33 @@
                   <div v-for="value in filter.values" :key="value.min"
                     class=" st:text-[14px] st:text-[#213555] st:font-[700] st:capitalize">
                     <div v-if="value.count > 0" class="st:flex st:items-center st:justify-between">
-                      <label class="st:flex st:gap-[8px] st:items-center st:justify-center st:cursor-pointer">
-                        <input type="checkbox" :value="value" v-model="filter.selected" @change="applyFilters"
-                          class="st:hidden">
-                        <div
-                          class="st:w-[16px] st:h-[16px] st:border st:border-back st:flex st:items-center st:justify-center">
+                      <label
+                        class="st:flex st:w-full st:gap-[8px] st:items-center st:justify-between st:cursor-pointer">
 
-                          <img src="/src/assets/tick.svg" alt="tick" class="st:w-[15px] st:h-[15px]"
-                            v-if="filter.selected.some(val => val.min === value.min)">
+                        <div class="st:flex st:items-center st:gap-[8px]">
+                          <input type="checkbox" :value="value" v-model="filter.selected" @change="applyFilters"
+                            class="st:hidden">
+                          <div
+                            class="st:w-[16px] st:h-[16px] st:border st:border-back st:flex st:items-center st:justify-center">
+
+                            <img src="/src/assets/tick.svg" alt="tick" class="st:w-[15px] st:h-[15px]"
+                              v-if="filter.selected.some(val => val.min === value.min)">
+                          </div>
+
+                          <div v-if="filter.field === 'discounted_price'"
+                            class=" st:hover:text-black st:hover:underline">
+                            <span v-if="value.min === 0">Below ${{ value.max }}</span>
+                            <span v-else-if="value.min === 401">${{ value.min }} & Above</span>
+                            <span v-else>${{ value.min }} - ${{ value.max }}</span>
+                          </div>
+                          <div v-else-if="filter.field === 'discount'">
+                            <span class=" st:hover:text-black st:hover:underline">{{ value.min }}% Off Or More</span>
+                          </div>
                         </div>
 
-                        <div v-if="filter.field === 'discounted_price'" class=" st:hover:text-black st:hover:underline">
-                          <span v-if="value.min === 0">Below ${{ value.max }}</span>
-                          <span v-else-if="value.min === 401">${{ value.min }} & Above</span>
-                          <span v-else>${{ value.min }} - ${{ value.max }}</span>
-                        </div>
-                        <div v-else-if="filter.field === 'discount'">
-                          <span class=" st:hover:text-black st:hover:underline">{{ value.min }}% Off Or More</span>
-                        </div>
+
+                        <span>({{ value.count }})</span>
                       </label>
-
-                      <span>({{ value.count }})</span>
                     </div>
                   </div>
                 </div>
@@ -213,17 +237,17 @@
 
           <!-- dynamicfilters -->
           <div v-if="selectFilters.length > 0"
-            class="st:flex st:md:flex-wrap st:w-full st:overflow-x-auto st:items-start st:justify-start st:mt-[20px] st:md:mt-0 st:md:mb-[20px] st:gap-[20px] st:text-[14px] st:font-[500]">
+            class="st:flex st:md:flex-wrap st:w-full st:overflow-x-auto st:items-start st:justify-start st:mt-[20px] st:md:mt-0 st:md:mb-[20px] st:gap-[20px] st:text-[14px] st:font-[500] st:h-[35px]">
             <div v-for="(item, index) in selectFilters" :key="index" @click="removeFilter(item)"
-              class="st:flex st:items-center st:gap-[10px] st:border st:border-gray-400 st:px-[10px] st:py-[5px] st:rounded-full st:cursor-pointer">
+              class="st:flex st:items-center st:gap-[10px] st:border st:hover:border-[2px] st:border-gray-300 st:hover:border-gray-500 st:px-[10px] st:py-[5px] st:rounded-full st:cursor-pointer">
               <span class="st:text-nowrap">{{ item.label }}</span>
-              <button class="st:font-[600] st:cursor-pointer">X</button>
+              <img src="/src/assets/cross.svg" alt="cross" class="st:w-[20px]">
             </div>
           </div>
 
           <div v-show="results.length > 0"
             class="st:flex st:items-center st:justify-between st:w-full st:pb-[10px] st:px-[5px] st:md:px-[10px]">
-            <div class="st:my-[20px] st:md:my-0">
+            <div class="st:my-[20px] st:md:my-0 st:w-[300px]">
               <span
                 class="st:text-[14px] st:text-[#000] st:font-[400] st:letter-spacing:[0.6px] st:opacity-[0.7] st:pt-[13px] st:md:pt-0">Showing
                 <strong class="st:font-[700]">
@@ -257,27 +281,34 @@
                 class="st:bg-white st:rounded-[15px] st:shadow-md st:py-[10px] st:flex st:flex-col st:items-stretch st:tracking-[0.6px]">
 
                 <div class="st:cursor-pointer st:relative">
-                  <img v-if="product.image" :src="product.image.src" alt="product"
-                    class="st:w-full st:h-[250px] st:object-cover st:rounded-[6px] st:px-[10px] st:relative st:hover:opacity-0 st:z-30" />
-                  <img v-if="product.images[1]" :src="product.images[1].src" alt="product"
-                    class="st:w-full st:h-[250px] st:object-cover st:rounded-[6px] st:px-[10px] st:absolute st:top-0 st:left-0" />
-                  <img v-else-if="product.images[0]" :src="product.images[0].src" alt="product"
-                    class="st:w-full st:h-[250px] st:object-cover st:rounded-[6px] st:px-[10px] st:absolute st:top-0 st:left-0" />
+                  <a :href="`${baseURl}/products/${product.handle}`">
+                    <img v-if="product.image" :src="product.image.src" alt="product"
+                      class="st:w-full st:h-[250px] st:object-cover st:rounded-[6px] st:px-[10px] st:relative st:hover:opacity-0 st:z-30" />
+                    <img v-if="product.images[1]" :src="product.images[1].src" alt="product"
+                      class="st:w-full st:h-[250px] st:object-cover st:rounded-[6px] st:px-[10px] st:absolute st:top-0 st:left-0" />
+                    <img v-else-if="product.images[0]" :src="product.images[0].src" alt="product"
+                      class="st:w-full st:h-[250px] st:object-cover st:rounded-[6px] st:px-[10px] st:absolute st:top-0 st:left-0" />
 
-                  <p v-if="product.discount > 0"
-                    class="st:text-[12px] st:text-[#fff] st:font-[400] st:border-[1px] st:bg-red-500 st:absolute st:top-[4px] st:right-[4px] st:md:top-[13.5px]  st:md:right-[10px] st:p-[4px_10px] st:md:p-[5px_13px_6px_13px] st:rounded-full st:z-10 st:mt-0 st:md:mt-[-10px]">
-                    {{ product.discount }}% OFF
-                  </p>
+                    <p v-if="product.discount > 0"
+                      class="st:text-[12px] st:text-[#fff] st:font-[400] st:border-[1px] st:bg-red-500 st:absolute st:top-[4px] st:right-[4px] st:md:top-[13.5px]  st:md:right-[10px] st:p-[4px_10px] st:md:p-[5px_13px_6px_13px] st:rounded-full st:z-10 st:mt-0 st:md:mt-[-10px]">
+                      {{ product.discount }}% OFF
+                    </p>
+                  </a>
                 </div>
 
                 <div
                   class="st:flex st:flex-col st:items-center st:mt-[10px] st:gap-[10px] st:w-full st:flex-1 st:text-center">
-                  <h3
-                    class="st:text-[15px] st:font-[700] st:cursor-pointer st:line-clamp-2 st:md:line-clamp-1 st:hover:underline st:px-[10px]">
-                    {{ product.title }}
-                  </h3>
 
-                  <h3 class="st:text-[12px] st:md:text-[14px] st:capitalize st:text-[#213555]  st:font-[800]">
+                  <a :href="`${baseURl}/products/${product.handle}`">
+                    <h3 style="font-family: 'Poppins',sans-serif;"
+                      class="st:text-[15px] st:font-[700] st:cursor-pointer st:line-clamp-2 st:md:line-clamp-1 st:hover:underline st:px-[10px]">
+                      {{ product.title }}
+                    </h3>
+                  </a>
+
+
+                  <h3 style="font-family: 'Poppins',sans-serif;"
+                    class="st:text-[12px] st:md:text-[14px] st:capitalize st:text-[#213555]  st:font-[800]">
                     {{ product.vendor }}
                   </h3>
 
@@ -670,18 +701,26 @@ export default {
         this.showMobileSort = false;
         this.initialLoading = true;
       } else {
+        window.history.pushState({}, "", "../")
         this.sortVal = this.defaultSort;
         this.clearFilters();
       }
     },
 
+    clearSearch() {
+      this.query = "";
+      window.history.replaceState(
+        {}, "", window.location.pathname);
+      this.handleSearch();
+    },
+
     handleScroll() {
       this.scrollToTopvisibility = window.scrollY > 1000;
 
-      if (document.activeElement.tagName === 'INPUT') {
+      const isMobile = window.innerWidth <= 768;
+      if (isMobile && document.activeElement.tagName === 'INPUT') {
         document.activeElement.blur();
       }
-
     },
 
     scrollToTop() {
@@ -721,7 +760,13 @@ export default {
         return filter.values.some(v => v.count > 0);
       }
       return true;
-    }
+    },
+
+    // goToProductPage(handle) {
+    //   if (!handle) return;
+
+    //   window.location.origin = `/products/${handle}`;
+    // }
 
   },
   computed: {
@@ -768,6 +813,10 @@ export default {
         }
       });
       return showFilter;
+    },
+
+    baseURl() {
+      return window.location.origin;
     },
 
     defaultSort() {
