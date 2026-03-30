@@ -748,7 +748,7 @@ export default {
               else label = `$${val.min} - $${val.max}`
             }
             if (filter.field === 'discount') {
-              label = `$${val.max}% Off Or More`
+              label = `$${val.min}% Off Or More`
             }
             showFilter.push({
               field: filter.field,
