@@ -20,7 +20,7 @@
 
 
 
-  <main class=" st:bg-[#f5f5f5] st:pt-[40px]">
+  <main class="st:bg-[#f5f5f5] st:pt-[40px]">
 
     <!-- scroll to top -->
     <div v-show="!showMobileFilters && !showMobileSort"
@@ -78,7 +78,7 @@
             </svg>
             <p class="st:text-[15px] st:text-[121212]">Filter</p>
           </div>
-          <div @click="showMobileSort = true"
+          <div @click="toggleMobileSort"
             class="st:flex st:items-center st:justify-center st:w-1/2 st:border-[1px] st:bg-white st:rounded-[5px] st:p-[7px]">
             <svg class="st:w-[18px]" viewBox="0 0 500 500" width="18" height="18" fill="#121212">
               <rect x="0" y="277.333" width="128" height="42.667"></rect>
@@ -226,15 +226,14 @@
         <div class="st:w-full st:md:w-[80%] st:lg:w-[85%] st:items-start st:pb-[8px]">
 
 
-          <div v-if="showMobileSort" @click="showMobileSort = false"
-            class="st:fixed st:z-500 st:inset-0 st:bg-black/50">
+          <div v-if="showMobileSort" @click="toggleMobileSort" class="st:fixed st:z-500 st:inset-0 st:bg-black/50">
           </div>
           <!-- mobileSort -->
           <div
-            :class="['st:flex st:flex-col st:md:hidden st:bg-white st:w-full st:h-fit st:px-[20px] st:gap-[15px] st:pb-[20px]', showMobileSort ? 'st:fixed st:bottom-0 st:left-0 st:z-100' : 'st:hidden']">
+            :class="['st:flex st:flex-col st:md:hidden st:bg-white st:w-full st:h-fit st:px-[20px] st:gap-[15px] st:pb-[20px]', showMobileSort ? 'st:fixed st:bottom-0 st:left-0 st:z-10000' : 'st:hidden']">
             <div
               class="st:flex  st:border-b-[1px] st:w-full st:border-gray-300 st:outline-none st:items-center st:justify-start st:py-[12px]">
-              <p @click="showMobileSort = false" class="st:text-black st:text-[18px] st:w-1/2">✖</p>
+              <p @click="toggleMobileSort" class="st:text-black st:text-[18px] st:w-1/2">✖</p>
               <p class="st:text-[18px] st:font-[400] st:w-1/2 st:-ml-[40px]">SORT BY</p>
             </div>
             <p class="st:text-[14px] st:capitalize st:letter-spacing:[0.4px]" v-for="sort in sortOptions"
@@ -619,7 +618,7 @@ export default {
     sortData(sortParam = null) {
       if (sortParam)
         this.sortVal = sortParam;
-      this.showMobileSort = false;
+      this.toggleMobileSort();
       this.displayData(0);
 
     },
@@ -692,12 +691,18 @@ export default {
       );
     },
 
+    toggleMobileSort() {
+      this.showMobileSort = !this.showMobileSort;
+
+      document.getElementById('body').classList.toggle("st:overflow-hidden");
+    },
+
     handleSearch() {
       if (this.query.trim() === "") {
         this.resetAll();
         window.history.pushState(
           {}, "", window.location.pathname);
-        this.showMobileSort = false;
+        this.toggleMobileSort();
         this.initialLoading = true;
       } else {
         window.history.pushState({}, "", "../")
