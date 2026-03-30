@@ -581,8 +581,6 @@ export default {
         this.showData(skip);
         this.resp = await this.client.search(this.query, "GXRDI1DDCJYW9MPFLDY3AH38");
         this.results = this.resp.results;
-        console.log("resp", this.resp);
-
 
         this.filters.forEach(filter => {
           if (filter.type === 'textFacet') {
@@ -693,7 +691,6 @@ export default {
 
     toggleMobileSort() {
       this.showMobileSort = !this.showMobileSort;
-
       document.getElementById('body').classList.toggle("st:overflow-hidden");
     },
 
@@ -702,7 +699,9 @@ export default {
         this.resetAll();
         window.history.pushState(
           {}, "", window.location.pathname);
-        this.toggleMobileSort();
+
+        this.showMobileSort = false;
+        document.getElementById('body').classList.remove("st:overflow-hidden");
         this.initialLoading = true;
       } else {
         window.history.pushState({}, "", "../")
